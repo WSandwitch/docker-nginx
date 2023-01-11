@@ -12,7 +12,7 @@ ENV MEMC_MODULE_VERSION v0.19
 # https://github.com/vision5/ngx_devel_kit
 ENV NDK_MODULE_VERSION v0.3.1
 # https://github.com/openresty/ngx_postgres
-ENV POSTGRES_MODULE_VERSION master
+ENV POSTGRES_MODULE_VERSION 1.0
 # https://github.com/openresty/rds-json-nginx-module
 ENV RDSJSON_MODULE_VERSION v0.15
 # https://github.com/openresty/redis2-nginx-module
@@ -24,7 +24,7 @@ ENV SETMISC_MODULE_VERSION v0.33
 # https://github.com/levonet/nginx-sticky-module-ng
 ENV STICKY_MODULE_VERSION nginx-1.23.0
 # https://github.com/openresty/srcache-nginx-module
-ENV SRCACHE_MODULE_VERSION master
+ENV SRCACHE_MODULE_VERSION v0.32
 # https://github.com/weibocom/nginx-upsync-module
 ENV UPSYNC_MODULE_VERSION v2.1.3
 # https://github.com/xiaokai-wang/nginx-stream-upsync-module
