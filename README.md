@@ -1,30 +1,27 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`latest` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/master/Dockerfile)
-- [`1.23.1-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.23.1/Dockerfile) Mainline version
-- [`1.22.0-alpine`, `1.22-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.22.0/Dockerfile) Stable version
+- [`latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/master/Dockerfile)
+- [`1.23.1-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile) Mainline version
+- [`1.22.0-alpine`, `1.22-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.22.0/Dockerfile) Stable version
 - <details><summary>Older versions</summary>
 
-  - [`1.21.6-alpine`, `1.21-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.21.6/Dockerfile)
-  - [`1.20.1-alpine`, `1.20-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.20.1/Dockerfile)
-  - [`1.19.10-alpine`, `1.19-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.19.10/Dockerfile)
-  - [`1.18.0-alpine`, `1.18-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.18.0/Dockerfile)
-  - [`1.17.10-alpine`, `1.17-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.17.10/Dockerfile)
-  - [`1.16.0-alpine`, `1.16-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.16.0/Dockerfile)
-  - [`1.15.12-alpine`, `1.15-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.15.12/Dockerfile)
-  - [`1.14.2-alpine`, `1.14-alpine` (*Dockerfile*)](https://github.com/levonet/docker-nginx/blob/v1.14.2/Dockerfile)
+  - [`1.21.6-alpine`, `1.21-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.21.6/Dockerfile)
+  - [`1.20.1-alpine`, `1.20-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.20.1/Dockerfile)
+  - [`1.19.10-alpine`, `1.19-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.19.10/Dockerfile)
+  - [`1.18.0-alpine`, `1.18-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.18.0/Dockerfile)
+  - [`1.17.10-alpine`, `1.17-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.17.10/Dockerfile)
+  - [`1.16.0-alpine`, `1.16-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.16.0/Dockerfile)
+  - [`1.15.12-alpine`, `1.15-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.15.12/Dockerfile)
+  - [`1.14.2-alpine`, `1.14-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.14.2/Dockerfile)
 </details>
 
 # NGINX build with load balancer modules
-[![](https://images.microbadger.com/badges/image/levonet/nginx.svg)](https://microbadger.com/images/levonet/nginx "Get your own image badge on microbadger.com")
-[![Docker Pulls](https://img.shields.io/docker/pulls/levonet/nginx.svg)](https://hub.docker.com/r/levonet/nginx/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/wsandwitch/nginx.svg)](https://hub.docker.com/r/wsandwitch/nginx/)
 
-**Fastest** and **smaller** Nginx built for x86-64 CPU architecture.
-Nginx binaries are compiled to leverage SSE 4.2 instruction set.
+**Fastest** and **smaller** Nginx built for many CPU architecture.
 
 The difference from the [official Nginx docker image](https://hub.docker.com/_/nginx):
 
-- x86-64 CPU architecture only
 - with [njs scripting language](http://nginx.org/en/docs/njs/) dynamic module
 - with [Sticky](https://github.com/levonet/nginx-sticky-module-ng) dynamic module
 - with [Sync upstreams](https://github.com/weibocom/nginx-upsync-module#readme) dynamic module
@@ -52,19 +49,19 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 ### Hosting some simple static content
 
 ```sh
-docker run --name some-nginx -d -v /some/content:/usr/share/nginx/html:ro levonet/nginx
+docker run --name some-nginx -d -v /some/content:/usr/share/nginx/html:ro wsandwitch/nginx-extra
 ```
 
 ### Exposing ports
 
 ```sh
-docker run --name some-nginx -d -p 80:80 -e 443 -p 443:443 levonet/nginx
+docker run --name some-nginx -d -p 80:80 -e 443 -p 443:443 wsandwitch/nginx-extra
 ```
 
 ### Complex configuration
 
 ```sh
-docker run --name some-nginx -d -v /host/path/virtualhosts.d:/etc/nginx/sites-enabled:ro levonet/nginx
+docker run --name some-nginx -d -v /host/path/virtualhosts.d:/etc/nginx/sites-enabled:ro wsandwitch/nginx-extra
 ```
 For example porting Ubuntu nginx to docker:
 
@@ -74,7 +71,7 @@ docker run --name some-nginx -d -p 80:80 -e 443 -p 443:443 \
     -v /etc/nginx/sites-available:/etc/nginx/sites-available \
     -v /etc/nginx/sites-enabled:/etc/nginx/sites-enabled \
     -v /var/log/nginx:/var/log/nginx \
-    levonet/nginx
+    wsandwitch/nginx-extra
 ```
 
 ### Modules
@@ -82,7 +79,7 @@ docker run --name some-nginx -d -p 80:80 -e 443 -p 443:443 \
 List dynamic modules in container:
 
 ```sh
-docker run -t --rm levonet/nginx ls /usr/lib/nginx/modules
+docker run -t --rm wsandwitch/nginx-extra ls /usr/lib/nginx/modules
 ```
 
 Example of loading a module in `nginx.conf`:
@@ -94,7 +91,7 @@ load_module modules/ngx_http_js_module.so;
 ### njs scripts development
 
 ```sh
-docker run -it --rm levonet/nginx njs
+docker run -it --rm wsandwitch/nginx-extra njs
 >> var a = {b: []};
 undefined
 >> console.log(a);
@@ -115,7 +112,7 @@ To start a specific example, go to an example folder and run `docker-compose up`
 
 ## Image Variants
 
-### `levonet/nginx:<version>-alpine`
+### `wsandwitch/nginx-extra:<version>-alpine`
 
 This image is based on the popular [Alpine Linux project](http://alpinelinux.org/), available in [the `alpine` official image](https://hub.docker.com/_/alpine).
 Alpine Linux is much smaller than most distribution base images (~5MB), and thus leads to much slimmer images in general.

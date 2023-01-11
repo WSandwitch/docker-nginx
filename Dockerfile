@@ -37,8 +37,8 @@ ENV OPENTRACING_LIB_VERSION v1.6.0
 ENV OPENTRACING_MODULE_VERSION v0.26.0
 
 COPY *.patch /tmp/
+
 RUN set -eux \
-    && export GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
     && addgroup -S -g 101 nginx \
     && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 100 nginx \
     && apk add --no-cache \
@@ -59,7 +59,11 @@ RUN set -eux \
         pcre-dev \
         postgresql-dev \
         readline-dev \
-        zlib-dev \
+        zlib-dev
+
+
+RUN set -eux \
+    && export GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
     # https://nginx.org/en/pgp_keys.html
     && curl -fSL https://nginx.org/keys/thresh.key -o nginx_signing.key \
     && curl -fSL https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz -o nginx.tar.gz \
@@ -149,11 +153,11 @@ RUN set -eux \
     && git clone --depth=1 --single-branch -b ${STICKY_MODULE_VERSION} https://github.com/levonet/nginx-sticky-module-ng.git \
     \
     # Upstream health check
-    && git clone --depth=1 https://github.com/2Fast2BCn/nginx_upstream_check_module.git \
-    && (cd nginx_upstream_check_module; \
-        patch -p1 < /tmp/nginx_upstream_check_module-only-worker-proccess.patch; \
-    ) \
-    && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.18.0.patch \
+    && git clone --depth=1 https://github.com/yaoweibin/nginx_upstream_check_module.git \
+#    && (cd nginx_upstream_check_module; \
+#        patch -p1 < /tmp/nginx_upstream_check_module-only-worker-proccess.patch; \
+#    ) \
+    && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.16.1+.patch \
     \
     # Brotli
     && git clone --depth=1 https://github.com/google/ngx_brotli.git \
@@ -176,13 +180,13 @@ RUN set -eux \
     && git clone --depth=1 --single-branch -b ${NJS_MODULE_VERSION} https://github.com/nginx/njs.git \
     && (cd njs; \
         ./configure \
-            --cc-opt="-O2 -m64 -march=x86-64 -mfpmath=sse -msse4.2 -pipe -fPIC -fomit-frame-pointer"; \
+            --cc-opt="-O2 -pipe -fPIC -fomit-frame-pointer"; \
         make; \
         make unit_test; \
         install -m755 build/njs /usr/bin/ \
     ) \
     \
-    && CFLAGS="-Ofast -m64 -mtune=generic -march=x86-64 -mfpmath=sse -msse4.2 -pipe -fPIE -fPIC -flto -funroll-loops -fstack-protector-strong -ffast-math -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2" \
+    && CFLAGS="-Ofast -pipe -fPIE -fPIC -flto -funroll-loops -fstack-protector-strong -ffast-math -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2" \
         ./configure \
             --prefix=/etc/nginx \
             --sbin-path=/usr/sbin/nginx \
