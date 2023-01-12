@@ -24,7 +24,7 @@ ENV SETMISC_MODULE_VERSION v0.33
 # https://github.com/levonet/nginx-sticky-module-ng
 ENV STICKY_MODULE_VERSION nginx-1.23.0
 # https://github.com/openresty/srcache-nginx-module
-ENV SRCACHE_MODULE_VERSION v0.32
+ENV SRCACHE_MODULE_VERSION master
 # https://github.com/weibocom/nginx-upsync-module
 ENV UPSYNC_MODULE_VERSION v2.1.3
 # https://github.com/xiaokai-wang/nginx-stream-upsync-module
