@@ -35,6 +35,8 @@ ENV JAEGER_CLIENT_VERSION v0.9.0
 ENV OPENTRACING_LIB_VERSION v1.6.0
 # https://github.com/opentracing-contrib/nginx-opentracing
 ENV OPENTRACING_MODULE_VERSION v0.26.0
+# https://github.com/matsumotory/ngx_mruby
+ENV MRUBY_MODULE_VERSION v2.2.5
 
 COPY *.patch /tmp/
 
@@ -55,11 +57,14 @@ RUN set -eux \
         linux-headers \
         make \
         openssl-dev \
+        ruby-rake \
         patch \
         pcre-dev \
         postgresql-dev \
         readline-dev \
-        zlib-dev
+        fts \
+        zlib-dev \
+        fts-dev 
 
 
 RUN set -eux \
@@ -178,12 +183,21 @@ RUN set -eux \
     \
     # njs scripting language
     && git clone --depth=1 --single-branch -b ${NJS_MODULE_VERSION} https://github.com/nginx/njs.git \
-    && (cd njs; \
+    && (cd njs && \
         ./configure \
-            --cc-opt="-O2 -pipe -fPIC -fomit-frame-pointer"; \
-        make; \
-        make unit_test; \
+            --cc-opt="-O2 -pipe -fPIC -fomit-frame-pointer" && \
+        make && \
+        make unit_test && \
         install -m755 build/njs /usr/bin/ \
+    ) \
+    \
+    # mruby scripting language
+    && git clone --depth=1 --single-branch -b ${MRUBY_MODULE_VERSION} https://github.com/matsumotory/ngx_mruby.git \
+    && (cd ngx_mruby && \
+        patch -p1 < /tmp/mruby_alpine.patch; \
+        ./configure --with-ngx-src-root=/usr/src/nginx-${NGINX_VERSION} --with-ngx-config-opt=--prefix=/etc/nginx && \
+        make build_mruby && \
+        make generate_gems_config \
     ) \
     \
     && CFLAGS="-Ofast -pipe -fPIE -fPIC -flto -funroll-loops -fstack-protector-strong -ffast-math -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2" \
@@ -239,6 +253,7 @@ RUN set -eux \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/redis2-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/set-misc-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/srcache-nginx-module \
+            --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_mruby \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
     && make -j$(getconf _NPROCESSORS_ONLN) \
