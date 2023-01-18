@@ -194,10 +194,10 @@ RUN set -eux \
     # mruby scripting language
     && git clone --depth=1 --single-branch -b ${MRUBY_MODULE_VERSION} https://github.com/matsumotory/ngx_mruby.git \
     && (cd ngx_mruby && \
-        patch -p1 < /tmp/mruby_alpine.patch; \
-        ./configure --with-ngx-src-root=/usr/src/nginx-${NGINX_VERSION} --with-ngx-config-opt=--prefix=/etc/nginx && \
+        patch -p1 < /tmp/mruby_alpine.patch && \
+        ./configure --enable-dynamic-module --with-ngx-src-root=/usr/src/nginx-${NGINX_VERSION} --with-ngx-config-opt=--prefix=/etc/nginx --with-ndk-root=/usr/src/nginx-${NGINX_VERSION}/ngx_devel_kit && \
         make build_mruby && \
-        make generate_gems_config \
+        make generate_gems_config_dynamic \
     ) \
     \
     && CFLAGS="-Ofast -pipe -fPIE -fPIC -flto -funroll-loops -fstack-protector-strong -ffast-math -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2" \
@@ -236,7 +236,7 @@ RUN set -eux \
             --with-stream_ssl_preread_module \
             --with-threads \
             --with-cc-opt="-I${HUNTER_INSTALL_DIR}/include" \
-            --with-ld-opt="-L${HUNTER_INSTALL_DIR}/lib" \
+            --with-ld-opt="-L${HUNTER_INSTALL_DIR}/lib -lfts" \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/echo-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/headers-more-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/memc-nginx-module \
@@ -253,7 +253,7 @@ RUN set -eux \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/redis2-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/set-misc-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/srcache-nginx-module \
-            --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_mruby \
+            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_mruby \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
     && make -j$(getconf _NPROCESSORS_ONLN) \
