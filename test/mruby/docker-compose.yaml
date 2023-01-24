@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  nginx:
+    image: ${DOCKER_IMAGE:-wsandwitch/nginx-extra:latest}
+    ports:
+    - "8000:8000"
+    volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf
+  test:
+    build: .
+    command: /usr/local/bin/dockerize -wait tcp://nginx:8000 -timeout 10s yarn test
+    environment:
+      NGINX_URL: http://nginx:8000
+    depends_on:
+    - nginx
