@@ -2,7 +2,7 @@ version: "3"
 
 services:
   nginx:
-    image: ${DOCKER_IMAGE:-levonet/nginx:latest}
+    image: ${DOCKER_IMAGE:-wsandwitch/nginx-extra:latest}
     ports:
     - "3128:3128"
     volumes:
