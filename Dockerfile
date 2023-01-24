@@ -42,7 +42,7 @@ COPY *.patch /tmp/
 
 RUN set -eux \
     && addgroup -S -g 101 nginx \
-    && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 100 nginx \
+    && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 101 nginx \
     && apk add --no-cache \
         cmake \
         curl \
@@ -195,8 +195,9 @@ RUN set -eux \
     && git clone --depth=1 --single-branch -b ${MRUBY_MODULE_VERSION} https://github.com/matsumotory/ngx_mruby.git \
     && (cd ngx_mruby && \
         patch -p1 < /tmp/mruby_alpine.patch && \
+        patch -p1 < /tmp/add_gems.patch && \
         ./configure --enable-dynamic-module --with-ngx-src-root=/usr/src/nginx-${NGINX_VERSION} --with-ngx-config-opt=--prefix=/etc/nginx --with-ndk-root=/usr/src/nginx-${NGINX_VERSION}/ngx_devel_kit && \
-        make build_mruby && \
+        NGX_MRUBY_CFLAGS=-O3 make build_mruby && \
         make generate_gems_config_dynamic \
     ) \
     \
@@ -298,9 +299,10 @@ RUN apk add --no-cache \
         pcre \
         readline \
         tzdata \
+	fts \
         zlib \
     && addgroup -S -g 101 nginx \
-    && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 100 nginx \
+    && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 101 nginx \
     && mkdir -p /var/log/nginx \
     && ln -sf /usr/local/lib/libjaegertracing.so /usr/local/lib/libjaegertracing_plugin.so \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
