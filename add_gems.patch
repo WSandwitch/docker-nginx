@@ -1,0 +1,13 @@
+diff --git a/build_config.rb b/build_config.rb
+index ebc9eb7..fc4a558 100644
+--- a/build_config.rb
++++ b/build_config.rb
+@@ -29,6 +29,8 @@ MRuby::Build.new('host') do |conf|
+   conf.gem :github => 'matsumotory/mruby-mutex'
+   conf.gem :github => 'matsumotory/mruby-localmemcache'
+   conf.gem :mgem => 'mruby-secure-random'
++  conf.gem :github => 'matsumotory/mruby-simplehttp'
++  conf.gem :github => 'matsumotory/mruby-httprequest'
+ 
+   # ngx_mruby extended class
+   conf.gem './mrbgems/ngx_mruby_mrblib'
