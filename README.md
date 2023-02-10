@@ -49,19 +49,19 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 ### Hosting some simple static content
 
 ```sh
-docker run --name some-nginx -d -v /some/content:/usr/share/nginx/html:ro wsandwitch/nginx-extra
+docker run --name some-nginx -d -v /some/content:/usr/share/nginx/html:ro wsandwitch/nginx
 ```
 
 ### Exposing ports
 
 ```sh
-docker run --name some-nginx -d -p 80:80 -e 443 -p 443:443 wsandwitch/nginx-extra
+docker run --name some-nginx -d -p 80:80 -e 443 -p 443:443 wsandwitch/nginx
 ```
 
 ### Complex configuration
 
 ```sh
-docker run --name some-nginx -d -v /host/path/virtualhosts.d:/etc/nginx/sites-enabled:ro wsandwitch/nginx-extra
+docker run --name some-nginx -d -v /host/path/virtualhosts.d:/etc/nginx/sites-enabled:ro wsandwitch/nginx
 ```
 For example porting Ubuntu nginx to docker:
 
@@ -79,7 +79,7 @@ docker run --name some-nginx -d -p 80:80 -e 443 -p 443:443 \
 List dynamic modules in container:
 
 ```sh
-docker run -t --rm wsandwitch/nginx-extra ls /usr/lib/nginx/modules
+docker run -t --rm wsandwitch/nginx ls /usr/lib/nginx/modules
 ```
 
 Example of loading a module in `nginx.conf`:
@@ -91,7 +91,7 @@ load_module modules/ngx_http_js_module.so;
 ### njs scripts development
 
 ```sh
-docker run -it --rm wsandwitch/nginx-extra njs
+docker run -it --rm wsandwitch/nginx njs
 >> var a = {b: []};
 undefined
 >> console.log(a);
@@ -112,7 +112,7 @@ To start a specific example, go to an example folder and run `docker-compose up`
 
 ## Image Variants
 
-### `wsandwitch/nginx-extra:<version>-alpine`
+### `wsandwitch/nginx:<version>-alpine`
 
 This image is based on the popular [Alpine Linux project](http://alpinelinux.org/), available in [the `alpine` official image](https://hub.docker.com/_/alpine).
 Alpine Linux is much smaller than most distribution base images (~5MB), and thus leads to much slimmer images in general.
