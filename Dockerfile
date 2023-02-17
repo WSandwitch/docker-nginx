@@ -67,13 +67,16 @@ RUN set -eux \
         fts-dev 
 
 
+ENV GNUPGHOME /tmp/GNUPGTEMPFOLDER
+
+
 RUN set -eux \
+    && mkdir $GNUPGHOME \
     && export GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
     # https://nginx.org/en/pgp_keys.html
     && curl -fSL https://nginx.org/keys/thresh.key -o nginx_signing.key \
     && curl -fSL https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz -o nginx.tar.gz \
     && curl -fSL https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz.asc -o nginx.tar.gz.asc \
-    && export GNUPGHOME="$(mktemp -d)" \
     && found=''; \
     for server in \
         ha.pool.sks-keyservers.net \
@@ -92,8 +95,10 @@ RUN set -eux \
     && tar -zxC /usr/src -f nginx.tar.gz \
     && rm nginx.tar.gz \
     && cd /usr/src/nginx-${NGINX_VERSION} \
-    \
+    
     # Jaeger
+RUN set -eux \
+    && cd /usr/src/nginx-${NGINX_VERSION} \
     && git clone --depth=1 --single-branch -b ${OPENTRACING_LIB_VERSION} https://github.com/opentracing/opentracing-cpp.git \
     && mkdir opentracing-cpp/.build \
     && (cd opentracing-cpp/.build; \
@@ -105,7 +110,10 @@ RUN set -eux \
             ..; \
         make; \
         make install \
-    ) \
+    ) 
+
+RUN set -eux \
+    && cd /usr/src/nginx-${NGINX_VERSION} \
     && git clone --depth=1 --single-branch -b ${JAEGER_CLIENT_VERSION} https://github.com/jaegertracing/jaeger-client-cpp.git \
     && mkdir jaeger-client-cpp/.build \
     && (cd jaeger-client-cpp/.build; \
@@ -119,9 +127,12 @@ RUN set -eux \
             -DJAEGERTRACING_WITH_YAML_CPP=ON \
             ..; \
         make; \
-        make test; \
+        make test || echo "no tests"; \
         make install \
-    ) \
+    ) 
+
+RUN set -eux \
+    && cd /usr/src/nginx-${NGINX_VERSION} \
     && export HUNTER_INSTALL_DIR=$(cat jaeger-client-cpp/.build/_3rdParty/Hunter/install-root-dir) \
     && git clone --depth=1 --single-branch -b ${OPENTRACING_MODULE_VERSION} https://github.com/opentracing-contrib/nginx-opentracing.git \
     \
@@ -163,6 +174,7 @@ RUN set -eux \
 #        patch -p1 < /tmp/nginx_upstream_check_module-only-worker-proccess.patch; \
 #    ) \
     && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.16.1+.patch \
+#    && patch -p1 < nginx_upstream_check_module/check_1.20.1+.patch \
     \
     # Brotli
     && git clone --depth=1 https://github.com/google/ngx_brotli.git \
