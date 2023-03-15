@@ -1,6 +1,6 @@
-FROM alpine:3.16 AS build
+FROM alpine:20230208 AS build
 
-ENV NGINX_VERSION 1.23.1
+ENV NGINX_VERSION 1.23.3
 # https://github.com/nginx/njs
 ENV NJS_MODULE_VERSION 0.7.6
 # https://github.com/openresty/echo-nginx-module
@@ -36,7 +36,7 @@ ENV OPENTRACING_LIB_VERSION v1.6.0
 # https://github.com/opentracing-contrib/nginx-opentracing
 ENV OPENTRACING_MODULE_VERSION v0.26.0
 # https://github.com/matsumotory/ngx_mruby
-ENV MRUBY_MODULE_VERSION v2.2.5
+ENV MRUBY_MODULE_VERSION v2.3.0
 
 COPY *.patch /tmp/
 
@@ -64,19 +64,16 @@ RUN set -eux \
         readline-dev \
         fts \
         zlib-dev \
-        fts-dev 
-
-
-ENV GNUPGHOME /tmp/GNUPGTEMPFOLDER
+        musl-fts-dev 
 
 
 RUN set -eux \
-    && mkdir $GNUPGHOME \
     && export GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
     # https://nginx.org/en/pgp_keys.html
     && curl -fSL https://nginx.org/keys/thresh.key -o nginx_signing.key \
     && curl -fSL https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz -o nginx.tar.gz \
     && curl -fSL https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz.asc -o nginx.tar.gz.asc \
+    && export GNUPGHOME="$(mktemp -d)" \
     && found=''; \
     for server in \
         ha.pool.sks-keyservers.net \
@@ -95,10 +92,8 @@ RUN set -eux \
     && tar -zxC /usr/src -f nginx.tar.gz \
     && rm nginx.tar.gz \
     && cd /usr/src/nginx-${NGINX_VERSION} \
-    
+    \
     # Jaeger
-RUN set -eux \
-    && cd /usr/src/nginx-${NGINX_VERSION} \
     && git clone --depth=1 --single-branch -b ${OPENTRACING_LIB_VERSION} https://github.com/opentracing/opentracing-cpp.git \
     && mkdir opentracing-cpp/.build \
     && (cd opentracing-cpp/.build; \
@@ -110,10 +105,7 @@ RUN set -eux \
             ..; \
         make; \
         make install \
-    ) 
-
-RUN set -eux \
-    && cd /usr/src/nginx-${NGINX_VERSION} \
+    ) \
     && git clone --depth=1 --single-branch -b ${JAEGER_CLIENT_VERSION} https://github.com/jaegertracing/jaeger-client-cpp.git \
     && mkdir jaeger-client-cpp/.build \
     && (cd jaeger-client-cpp/.build; \
@@ -127,12 +119,9 @@ RUN set -eux \
             -DJAEGERTRACING_WITH_YAML_CPP=ON \
             ..; \
         make; \
-        make test || echo "no tests"; \
+        make test; \
         make install \
-    ) 
-
-RUN set -eux \
-    && cd /usr/src/nginx-${NGINX_VERSION} \
+    ) \
     && export HUNTER_INSTALL_DIR=$(cat jaeger-client-cpp/.build/_3rdParty/Hunter/install-root-dir) \
     && git clone --depth=1 --single-branch -b ${OPENTRACING_MODULE_VERSION} https://github.com/opentracing-contrib/nginx-opentracing.git \
     \
@@ -174,7 +163,6 @@ RUN set -eux \
 #        patch -p1 < /tmp/nginx_upstream_check_module-only-worker-proccess.patch; \
 #    ) \
     && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.16.1+.patch \
-#    && patch -p1 < nginx_upstream_check_module/check_1.20.1+.patch \
     \
     # Brotli
     && git clone --depth=1 https://github.com/google/ngx_brotli.git \
@@ -206,6 +194,7 @@ RUN set -eux \
     # mruby scripting language
     && git clone --depth=1 --single-branch -b ${MRUBY_MODULE_VERSION} https://github.com/matsumotory/ngx_mruby.git \
     && (cd ngx_mruby && \
+        touch mruby/include/mruby/internal.h && \
         patch -p1 < /tmp/mruby_alpine.patch && \
         patch -p1 < /tmp/add_gems.patch && \
         ./configure --enable-dynamic-module --with-ngx-src-root=/usr/src/nginx-${NGINX_VERSION} --with-ngx-config-opt=--prefix=/etc/nginx --with-ndk-root=/usr/src/nginx-${NGINX_VERSION}/ngx_devel_kit && \
@@ -286,7 +275,7 @@ RUN set -eux \
         /usr/local/lib/libyaml-cpp.so* \
         /usr/local/lib/libjaegertracing.so*
 
-FROM alpine:3.16
+FROM alpine:20230208
 
 COPY --from=build /etc/nginx /etc/nginx
 COPY --from=build /usr/sbin/nginx /usr/sbin/nginx
@@ -312,6 +301,7 @@ RUN apk add --no-cache \
         readline \
         tzdata \
 	fts \
+	musl-fts \
         zlib \
     && addgroup -S -g 101 nginx \
     && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 101 nginx \
