@@ -1,4 +1,4 @@
-#PLATFORM_TAG ?= amd64
+PLATFORM_TAG ?= amd64
 DOCKER_TAG ?= latest_$(PLATFORM_TAG)
 DOCKER_IMAGE ?= wsandwitch/nginx-extra:$(DOCKER_TAG)
 TESTS = check jaeger njs proxy_connect redis sticky mruby

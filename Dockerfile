@@ -2,7 +2,7 @@ FROM alpine:20230208 AS build
 
 ENV NGINX_VERSION 1.23.3
 # https://github.com/nginx/njs
-ENV NJS_MODULE_VERSION 0.7.6
+ENV NJS_MODULE_VERSION 0.7.11
 # https://github.com/openresty/echo-nginx-module
 ENV ECHO_MODULE_VERSION v0.62
 # https://github.com/openresty/headers-more-nginx-module
@@ -63,6 +63,7 @@ RUN set -eux \
         postgresql-dev \
         readline-dev \
         fts \
+        libxml2-dev libxslt-dev \
         zlib-dev \
         musl-fts-dev 
 
@@ -302,6 +303,7 @@ RUN apk add --no-cache \
         tzdata \
 	fts \
 	musl-fts \
+	libxml2 libxslt\
         zlib \
     && addgroup -S -g 101 nginx \
     && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 101 nginx \
