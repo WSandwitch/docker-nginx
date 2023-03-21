@@ -1,4 +1,4 @@
-FROM alpine:20230208 AS build
+FROM alpine:3.17 AS build
 
 ENV NGINX_VERSION 1.23.3
 # https://github.com/nginx/njs
@@ -276,7 +276,7 @@ RUN set -eux \
         /usr/local/lib/libyaml-cpp.so* \
         /usr/local/lib/libjaegertracing.so*
 
-FROM alpine:20230208
+FROM alpine:3.17
 
 COPY --from=build /etc/nginx /etc/nginx
 COPY --from=build /usr/sbin/nginx /usr/sbin/nginx
