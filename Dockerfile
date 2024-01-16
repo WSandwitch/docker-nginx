@@ -1,16 +1,18 @@
-FROM alpine:20230208 AS build
+FROM alpine:3.17 AS build
 
 ENV NGINX_VERSION 1.23.3
 # https://github.com/nginx/njs
 ENV NJS_MODULE_VERSION 0.7.11
+# https://github.com/google/ngx_brotli
+ENV BROTLI_MODULE_VERSION 6e975bcb015f62e1f303054897783355e2a877dc
 # https://github.com/openresty/echo-nginx-module
-ENV ECHO_MODULE_VERSION v0.62
+ENV ECHO_MODULE_VERSION v0.63
 # https://github.com/openresty/headers-more-nginx-module
 ENV HEADERS_MODULE_VERSION v0.34
 # https://github.com/openresty/memc-nginx-module
 ENV MEMC_MODULE_VERSION v0.19
 # https://github.com/vision5/ngx_devel_kit
-ENV NDK_MODULE_VERSION v0.3.1
+ENV NDK_MODULE_VERSION v0.3.2
 # https://github.com/openresty/ngx_postgres
 ENV POSTGRES_MODULE_VERSION 1.0
 # https://github.com/openresty/rds-json-nginx-module
@@ -34,9 +36,11 @@ ENV JAEGER_CLIENT_VERSION v0.9.0
 # https://github.com/opentracing/opentracing-cpp
 ENV OPENTRACING_LIB_VERSION v1.6.0
 # https://github.com/opentracing-contrib/nginx-opentracing
-ENV OPENTRACING_MODULE_VERSION v0.26.0
+ENV OPENTRACING_MODULE_VERSION v0.27.0
 # https://github.com/matsumotory/ngx_mruby
 ENV MRUBY_MODULE_VERSION v2.3.0
+# https://github.com/tokers/zstd-nginx-module
+ENV ZSTD_MODULE_VERSION master
 
 COPY *.patch /tmp/
 
@@ -65,6 +69,7 @@ RUN set -eux \
         fts \
         libxml2-dev libxslt-dev \
         zlib-dev \
+        zstd-dev \
         musl-fts-dev 
 
 
@@ -163,11 +168,19 @@ RUN set -eux \
 #    && (cd nginx_upstream_check_module; \
 #        patch -p1 < /tmp/nginx_upstream_check_module-only-worker-proccess.patch; \
 #    ) \
-    && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.16.1+.patch \
+    && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.20.1+.patch \
     \
     # Brotli
-    && git clone --depth=1 https://github.com/google/ngx_brotli.git \
-    && (cd ngx_brotli; git submodule update --init) \
+    && git clone https://github.com/google/ngx_brotli.git \
+    && ( \
+      cd ngx_brotli; \
+      git checkout ${BROTLI_MODULE_VERSION};  \
+      git submodule update --init; \
+      cd deps/brotli; \
+      mkdir out; cd out; \
+      cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS="-Ofast -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" -DCMAKE_CXX_FLAGS="-Ofast -flto -funroll-loops -ffunction-sections -fdata-sections -Wl,--gc-sections" -DCMAKE_INSTALL_PREFIX=./installed .. ;\
+      cmake --build . --config Release --target brotlienc ;\
+    ) \
     \
     # Redis
     && git clone --depth=1 --single-branch -b ${REDIS_MODULE_VERSION} https://github.com/zhuizhuhaomeng/ngx_http_redis.git \
@@ -202,6 +215,8 @@ RUN set -eux \
         NGX_MRUBY_CFLAGS=-O3 make build_mruby && \
         make generate_gems_config_dynamic \
     ) \
+    # ZStd compression
+    && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION} https://github.com/tokers/zstd-nginx-module.git \
     \
     && CFLAGS="-Ofast -pipe -fPIE -fPIC -flto -funroll-loops -fstack-protector-strong -ffast-math -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2" \
         ./configure \
@@ -247,7 +262,7 @@ RUN set -eux \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-sticky-module-ng \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-stream-upsync-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-upsync-module \
-            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_brotli \
+            --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_brotli \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_devel_kit \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_redis \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_postgres \
@@ -259,6 +274,7 @@ RUN set -eux \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_mruby \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
+            --add-module=/usr/src/nginx-${NGINX_VERSION}/zstd-nginx-module \
     && make -j$(getconf _NPROCESSORS_ONLN) \
     && make install \
     && rm -rf /etc/nginx/html/ \
@@ -276,7 +292,7 @@ RUN set -eux \
         /usr/local/lib/libyaml-cpp.so* \
         /usr/local/lib/libjaegertracing.so*
 
-FROM alpine:20230208
+FROM alpine:3.17
 
 COPY --from=build /etc/nginx /etc/nginx
 COPY --from=build /usr/sbin/nginx /usr/sbin/nginx
@@ -304,6 +320,7 @@ RUN apk add --no-cache \
 	fts \
 	musl-fts \
 	libxml2 libxslt\
+        zstd \
         zlib \
     && addgroup -S -g 101 nginx \
     && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 101 nginx \
