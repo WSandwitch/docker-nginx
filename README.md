@@ -1,8 +1,9 @@
 # Supported tags and respective `Dockerfile` links
 
 - [`latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/master/Dockerfile)
-- [`1.23.3-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.3/Dockerfile) Mainline version
-- [`1.23.1-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile) Mainline version
+- [`1.24.0-alpine`, `1.24-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.24.0/Dockerfile) 
+- [`1.23.3-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.3/Dockerfile) 
+- [`1.23.1-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile)
 
 # NGINX build with load balancer modules
 [![Docker Pulls](https://img.shields.io/docker/pulls/wsandwitch/nginx.svg)](https://hub.docker.com/r/wsandwitch/nginx/)
@@ -11,8 +12,8 @@
 
 The difference from the [official Nginx docker image](https://hub.docker.com/_/nginx):
 
-- with [njs scripting language](http://nginx.org/en/docs/njs/) dynamic module
-- with [nruby scripting language](https://github.com/matsumotory/ngx_mruby) dynamic module
+- with [njs scripting language](http://nginx.org/en/docs/njs/) dynamic module (with [js_inline patch](https://github.com/WSandwitch/njs_inline_patch))
+- with [mruby scripting language](https://github.com/matsumotory/ngx_mruby) dynamic module
 - with [Sticky](https://github.com/levonet/nginx-sticky-module-ng) dynamic module
 - with [Sync upstreams](https://github.com/weibocom/nginx-upsync-module#readme) dynamic module
 - with [Stream sync upstreams](https://github.com/xiaokai-wang/nginx-stream-upsync-module#readme) dynamic module
