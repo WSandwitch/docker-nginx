@@ -1,8 +1,9 @@
+  GNU nano 5.8                                                       add_gems.patch                                                                
 diff --git a/build_config.rb b/build_config.rb
-index ebc9eb7..ad7f66b 100644
+index ebc9eb7..fc4a558 100644
 --- a/build_config.rb
 +++ b/build_config.rb
-@@ -11,6 +11,7 @@ MRuby::Build.new('host') do |conf|
+@@ -11,6 +11,7 @@
    conf.linker do |linker|
      linker.flags << ENV['NGX_MRUBY_LDFLAGS'] if ENV['NGX_MRUBY_LDFLAGS']
      linker.libraries << ENV['NGX_MRUBY_LIBS'].split(',') if ENV['NGX_MRUBY_LIBS']
