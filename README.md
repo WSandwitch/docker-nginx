@@ -12,7 +12,7 @@
 
 The difference from the [official Nginx docker image](https://hub.docker.com/_/nginx):
 
-- with [njs scripting language](http://nginx.org/en/docs/njs/) dynamic module (with js_inline patch)
+- with [njs scripting language](http://nginx.org/en/docs/njs/) dynamic module (with [js_inline patch](https://github.com/WSandwitch/njs_inline_patch))
 - with [mruby scripting language](https://github.com/matsumotory/ngx_mruby) dynamic module
 - with [Sticky](https://github.com/levonet/nginx-sticky-module-ng) dynamic module
 - with [Sync upstreams](https://github.com/weibocom/nginx-upsync-module#readme) dynamic module
