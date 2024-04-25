@@ -19,8 +19,8 @@ ENV POSTGRES_MODULE_VERSION 1.0
 ENV RDSJSON_MODULE_VERSION nginx-1.25.3
 # https://github.com/openresty/redis2-nginx-module
 ENV REDIS2_MODULE_VERSION v0.15
-# https://github.com/osokin/ngx_http_redis
-ENV REDIS_MODULE_VERSION master
+# https://github.com/zhuizhuhaomeng/ngx_http_redis/
+ENV REDIS_MODULE_VERSION ngx-1.23
 # https://github.com/openresty/set-misc-nginx-module
 ENV SETMISC_MODULE_VERSION v0.33
 # https://github.com/levonet/nginx-sticky-module-ng
