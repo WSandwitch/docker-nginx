@@ -1,6 +1,6 @@
 FROM alpine:3.17 AS build
 
-ENV NGINX_VERSION 1.25.5
+ENV NGINX_VERSION 1.25.4
 # https://github.com/nginx/njs
 ENV NJS_MODULE_VERSION 0.8.4
 # https://github.com/google/ngx_brotli
@@ -76,7 +76,6 @@ RUN set -eux \
 RUN set -eux \
     && export GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
     # https://nginx.org/en/pgp_keys.html
-    && curl -fSL https://nginx.org/keys/arut.key -o nginx_signing.key \
     && curl -fSL https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz -o nginx.tar.gz \
     && curl -fSL https://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz.asc -o nginx.tar.gz.asc \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -91,7 +90,18 @@ RUN set -eux \
         gpg --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$GPG_KEYS" && found=yes && break; \
     done; \
     test -z "$found" && echo >&2 "error: failed to fetch GPG key $GPG_KEYS" && exit 1; \
-    gpg --import nginx_signing.key \
+    curl -fSL https://nginx.org/keys/pluknet.key -o nginx_signing.key \
+    && gpg --import nginx_signing.key \
+    && curl -fSL https://nginx.org/keys/maxim.key -o nginx_signing.key \
+    && gpg --import nginx_signing.key \
+    && curl -fSL https://nginx.org/keys/arut.key -o nginx_signing.key \
+    && gpg --import nginx_signing.key \
+    && curl -fSL https://nginx.org/keys/sb.key -o nginx_signing.key \
+    && gpg --import nginx_signing.key \
+    && curl -fSL https://nginx.org/keys/thresh.key -o nginx_signing.key \
+    && gpg --import nginx_signing.key \
+    && curl -fSL https://nginx.org/keys/nginx_signing.key -o nginx_signing.key \
+    && gpg --import nginx_signing.key \
     && gpg --batch --verify nginx.tar.gz.asc nginx.tar.gz \
     && rm -rf "$GNUPGHOME" nginx_signing.key nginx.tar.gz.asc \
     && mkdir -p /usr/src \
