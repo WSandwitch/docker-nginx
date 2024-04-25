@@ -1,20 +1,9 @@
 # Supported tags and respective `Dockerfile` links
 
 - [`latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/master/Dockerfile)
-- [`1.25.5-alpine`, `1.25-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile) 
-- [`1.23.1-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile) 
-- [`1.22.0-alpine`, `1.22-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.22.0/Dockerfile)
-- <details><summary>Older versions</summary>
-
-  - [`1.21.6-alpine`, `1.21-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.21.6/Dockerfile)
-  - [`1.20.1-alpine`, `1.20-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.20.1/Dockerfile)
-  - [`1.19.10-alpine`, `1.19-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.19.10/Dockerfile)
-  - [`1.18.0-alpine`, `1.18-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.18.0/Dockerfile)
-  - [`1.17.10-alpine`, `1.17-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.17.10/Dockerfile)
-  - [`1.16.0-alpine`, `1.16-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.16.0/Dockerfile)
-  - [`1.15.12-alpine`, `1.15-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.15.12/Dockerfile)
-  - [`1.14.2-alpine`, `1.14-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.14.2/Dockerfile)
-</details>
+- [`1.25.5-alpine`, `1.25-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.25.5/Dockerfile) 
+- [`1.23.3-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.3/Dockerfile) 
+- [`1.23.1-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile)
 
 # NGINX build with load balancer modules
 [![Docker Pulls](https://img.shields.io/docker/pulls/wsandwitch/nginx.svg)](https://hub.docker.com/r/wsandwitch/nginx/)
@@ -24,11 +13,13 @@
 The difference from the [official Nginx docker image](https://hub.docker.com/_/nginx):
 
 - with [njs scripting language](http://nginx.org/en/docs/njs/) dynamic module (with js_inline patch)
+- with [mruby scripting language](https://github.com/matsumotory/ngx_mruby) dynamic module
 - with [Sticky](https://github.com/levonet/nginx-sticky-module-ng) dynamic module
 - with [Sync upstreams](https://github.com/weibocom/nginx-upsync-module#readme) dynamic module
 - with [Stream sync upstreams](https://github.com/xiaokai-wang/nginx-stream-upsync-module#readme) dynamic module
 - with [Upstream health check](https://github.com/2Fast2BCn/nginx_upstream_check_module#readme) module
-- with [Brotli](https://github.com/google/ngx_brotli#readme) dynamic module
+- with [Brotli](https://github.com/google/ngx_brotli#readme) module
+- with [ZStd](https://github.com/tokers/zstd-nginx-module) module
 - with [Various set_xxx directives](https://github.com/openresty/set-misc-nginx-module#readme) dynamic module
 - with [Headers more](https://github.com/openresty/headers-more-nginx-module#readme) dynamic module
 - with [SRCache](https://github.com/openresty/srcache-nginx-module) dynamic module
