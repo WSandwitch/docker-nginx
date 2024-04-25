@@ -1,6 +1,6 @@
 FROM alpine:3.17 AS build
 
-ENV NGINX_VERSION 1.25.4
+ENV NGINX_VERSION 1.24.0
 # https://github.com/nginx/njs
 ENV NJS_MODULE_VERSION 0.8.4
 # https://github.com/google/ngx_brotli
