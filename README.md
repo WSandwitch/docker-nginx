@@ -1,8 +1,9 @@
 # Supported tags and respective `Dockerfile` links
 
 - [`latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/master/Dockerfile)
-- [`1.23.1-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile) Mainline version
-- [`1.22.0-alpine`, `1.22-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.22.0/Dockerfile) Stable version
+- [`1.25.5-alpine`, `1.25-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile) 
+- [`1.23.1-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile) 
+- [`1.22.0-alpine`, `1.22-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.22.0/Dockerfile)
 - <details><summary>Older versions</summary>
 
   - [`1.21.6-alpine`, `1.21-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.21.6/Dockerfile)
@@ -22,7 +23,7 @@
 
 The difference from the [official Nginx docker image](https://hub.docker.com/_/nginx):
 
-- with [njs scripting language](http://nginx.org/en/docs/njs/) dynamic module
+- with [njs scripting language](http://nginx.org/en/docs/njs/) dynamic module (with js_inline patch)
 - with [Sticky](https://github.com/levonet/nginx-sticky-module-ng) dynamic module
 - with [Sync upstreams](https://github.com/weibocom/nginx-upsync-module#readme) dynamic module
 - with [Stream sync upstreams](https://github.com/xiaokai-wang/nginx-stream-upsync-module#readme) dynamic module
