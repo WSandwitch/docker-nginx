@@ -1,6 +1,6 @@
 FROM alpine:3.17 AS build
 
-ENV NGINX_VERSION 1.24.0
+ENV NGINX_VERSION 1.25.4
 # https://github.com/nginx/njs
 ENV NJS_MODULE_VERSION 0.8.4
 # https://github.com/google/ngx_brotli
@@ -12,15 +12,15 @@ ENV HEADERS_MODULE_VERSION v0.37
 # https://github.com/openresty/memc-nginx-module
 ENV MEMC_MODULE_VERSION v0.20
 # https://github.com/vision5/ngx_devel_kit
-ENV NDK_MODULE_VERSION v0.3.2
+ENV NDK_MODULE_VERSION v0.3.3
 # https://github.com/openresty/ngx_postgres
 ENV POSTGRES_MODULE_VERSION 1.0
 # https://github.com/openresty/rds-json-nginx-module
 ENV RDSJSON_MODULE_VERSION nginx-1.25.3
 # https://github.com/openresty/redis2-nginx-module
 ENV REDIS2_MODULE_VERSION v0.15
-# https://github.com/zhuizhuhaomeng/ngx_http_redis/
-ENV REDIS_MODULE_VERSION ngx-1.23
+# https://github.com/centminmod/ngx_http_redis
+ENV REDIS_MODULE_VERSION 0.4.1-cmm
 # https://github.com/openresty/set-misc-nginx-module
 ENV SETMISC_MODULE_VERSION v0.33
 # https://github.com/levonet/nginx-sticky-module-ng
@@ -189,7 +189,7 @@ RUN set -eux \
     ) \
     \
     # Redis
-    && git clone --depth=1 --single-branch -b ${REDIS_MODULE_VERSION} https://github.com/zhuizhuhaomeng/ngx_http_redis.git \
+    && git clone --depth=1 --single-branch -b ${REDIS_MODULE_VERSION} https://github.com/centminmod/ngx_http_redis \
     \
     # A forward proxy module for CONNECT request handling
     && git clone --depth=1 https://github.com/chobits/ngx_http_proxy_connect_module.git \
