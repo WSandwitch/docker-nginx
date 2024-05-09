@@ -41,6 +41,8 @@ ENV OPENTRACING_MODULE_VERSION v0.27.0
 ENV MRUBY_MODULE_VERSION v2.5.0
 # https://github.com/tokers/zstd-nginx-module
 ENV ZSTD_MODULE_VERSION master
+# https://github.com/quictls/openssl
+ENV QUICTLS_VERSION openssl-3.1.5+quic
 
 COPY *.patch /tmp/
 
@@ -49,6 +51,7 @@ RUN set -eux \
     && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 101 nginx \
     && apk add --no-cache \
         cmake \
+        perl \
         curl \
         g++ \
         gcc \
@@ -60,7 +63,6 @@ RUN set -eux \
         libc-dev \
         linux-headers \
         make \
-        openssl-dev \
         ruby-rake \
         patch \
         pcre-dev \
@@ -106,10 +108,21 @@ RUN set -eux \
     && rm -rf "$GNUPGHOME" nginx_signing.key nginx.tar.gz.asc \
     && mkdir -p /usr/src \
     && tar -zxC /usr/src -f nginx.tar.gz \
-    && rm nginx.tar.gz \
+    && rm nginx.tar.gz 
+
+RUN set -eux && echo SSL \
     && cd /usr/src/nginx-${NGINX_VERSION} \
-    \
+    && git clone --depth=1 --single-branch -b ${QUICTLS_VERSION} https://github.com/quictls/openssl \
+    && (cd openssl && git submodule update --init --recursive; \
+        ./Configure --prefix=/opt/openssl --libdir=lib --api=1.1.1; \
+	make -j3; \
+        make test TESTS="-test_afalg"; \
+        make install; \
+    ) 
+
     # Jaeger
+RUN set -eux && echo opentracing \
+    && cd /usr/src/nginx-${NGINX_VERSION} \
     && git clone --depth=1 --single-branch -b ${OPENTRACING_LIB_VERSION} https://github.com/opentracing/opentracing-cpp.git \
     && mkdir opentracing-cpp/.build \
     && (cd opentracing-cpp/.build; \
@@ -119,9 +132,12 @@ RUN set -eux \
             -DBUILD_TESTING=OFF \
             -DCMAKE_BUILD_TYPE=Release \
             ..; \
-        make; \
+        make -j3; \
         make install \
-    ) \
+    ) 
+
+RUN set -eux && echo jaeger \
+    && cd /usr/src/nginx-${NGINX_VERSION} \
     && git clone --depth=1 --single-branch -b ${JAEGER_CLIENT_VERSION} https://github.com/jaegertracing/jaeger-client-cpp.git \
     && mkdir jaeger-client-cpp/.build \
     && (cd jaeger-client-cpp/.build; \
@@ -134,10 +150,13 @@ RUN set -eux \
             -DJAEGERTRACING_WARNINGS_AS_ERRORS=OFF \
             -DJAEGERTRACING_WITH_YAML_CPP=ON \
             ..; \
-        make; \
-        make test; \
+        make -j3; \
+#        make test; \
         make install \
-    ) \
+    ) 
+
+RUN set -eux && echo modules \
+    && cd /usr/src/nginx-${NGINX_VERSION} \
     && export HUNTER_INSTALL_DIR=$(cat jaeger-client-cpp/.build/_3rdParty/Hunter/install-root-dir) \
     && git clone --depth=1 --single-branch -b ${OPENTRACING_MODULE_VERSION} https://github.com/opentracing-contrib/nginx-opentracing.git \
     \
@@ -226,8 +245,11 @@ RUN set -eux \
         make generate_gems_config_dynamic \
     ) \
     # ZStd compression
-    && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION} https://github.com/tokers/zstd-nginx-module.git \
-    \
+    && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION} https://github.com/tokers/zstd-nginx-module.git 
+    
+RUN set -eux && echo nginx \
+    && cd /usr/src/nginx-${NGINX_VERSION} \
+    && export HUNTER_INSTALL_DIR=$(cat jaeger-client-cpp/.build/_3rdParty/Hunter/install-root-dir) \
     && CFLAGS="-Ofast -pipe -fPIE -fPIC -flto -funroll-loops -fstack-protector-strong -ffast-math -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2" \
         ./configure \
             --prefix=/etc/nginx \
@@ -257,14 +279,15 @@ RUN set -eux \
             --with-http_ssl_module \
             --with-http_stub_status_module \
             --with-http_v2_module \
+            --with-http_v3_module \
             --with-pcre \
             --with-stream \
             --with-stream_realip_module \
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
             --with-threads \
-            --with-cc-opt="-I${HUNTER_INSTALL_DIR}/include" \
-            --with-ld-opt="-L${HUNTER_INSTALL_DIR}/lib -lfts" \
+            --with-cc-opt="-I${HUNTER_INSTALL_DIR}/include -I./openssl/include" \
+            --with-ld-opt="-L${HUNTER_INSTALL_DIR}/lib -lfts -L./openssl" \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/echo-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/headers-more-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/memc-nginx-module \
@@ -313,15 +336,14 @@ COPY --from=build /usr/share/nginx /usr/share/nginx
 COPY --from=build /usr/local/lib/libopentracing.so* /usr/local/lib/
 COPY --from=build /usr/local/lib/libyaml-cpp.so* /usr/local/lib/
 COPY --from=build /usr/local/lib/libjaegertracing.so* /usr/local/lib/
+COPY --from=build /opt/openssl /opt/openssl
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY nginx.vh.default.conf /etc/nginx/conf.d/default.conf
 
 RUN apk add --no-cache \
-        libcrypto1.1 \
         libintl \
         libpq \
-        libssl1.1 \
         libstdc++ \
         musl \
         pcre \
@@ -336,6 +358,7 @@ RUN apk add --no-cache \
     && adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx -u 101 nginx \
     && mkdir -p /var/log/nginx \
     && ln -sf /usr/local/lib/libjaegertracing.so /usr/local/lib/libjaegertracing_plugin.so \
+    && ln -sf /opt/openssl/lib/*so* /usr/lib/ \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
