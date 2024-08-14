@@ -1,9 +1,10 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`1.25.4http3-alpine`, `1.25-alpine`, `latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.25.4/Dockerfile) 
-- [`1.25.4-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.25.4/Dockerfile) 
-- [`1.23.3-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.3/Dockerfile) 
-- [`1.23.1-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile)
+- [`1.25.4http3-alpine`, `1.25-alpine`, `latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
+- [`1.25.4-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
+- [`1.24.0-alpine`, `1.24-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.24.0/Dockerfile) 
+- [`1.23.3-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.23.3/Dockerfile) 
+- [`1.23.1-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.23.1/Dockerfile)
 
 # NGINX build with load balancer modules
 [![Docker Pulls](https://img.shields.io/docker/pulls/wsandwitch/nginx.svg)](https://hub.docker.com/r/wsandwitch/nginx/)

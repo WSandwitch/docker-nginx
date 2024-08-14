@@ -43,6 +43,8 @@ ENV MRUBY_MODULE_VERSION v2.5.0
 ENV ZSTD_MODULE_VERSION master
 # https://github.com/quictls/openssl
 ENV QUICTLS_VERSION openssl-3.1.5+quic
+# https://github.com/AlecJY/socks-nginx-module
+ENV SOCKS5HTTP_VERSION space-fix
 
 COPY *.patch /tmp/
 
@@ -245,8 +247,10 @@ RUN set -eux && echo modules \
         make generate_gems_config_dynamic \
     ) \
     # ZStd compression
-    && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION} https://github.com/tokers/zstd-nginx-module.git 
-    
+    && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION} https://github.com/tokers/zstd-nginx-module.git \
+    # http_socks5
+    && git clone --depth=1 --single-branch -b ${SOCKS5HTTP_VERSION} https://github.com/AlecJY/socks-nginx-module.git
+
 RUN set -eux && echo nginx \
     && cd /usr/src/nginx-${NGINX_VERSION} \
     && export HUNTER_INSTALL_DIR=$(cat jaeger-client-cpp/.build/_3rdParty/Hunter/install-root-dir) \
@@ -308,6 +312,7 @@ RUN set -eux && echo nginx \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/zstd-nginx-module \
+            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/socks-nginx-module \
     && make -j$(getconf _NPROCESSORS_ONLN) \
     && make install \
     && rm -rf /etc/nginx/html/ \
