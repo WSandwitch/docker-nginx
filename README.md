@@ -1,14 +1,15 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/master/Dockerfile)
-- [`1.24.0-alpine`, `1.24-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.24.0/Dockerfile) 
-- [`1.23.3-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.3/Dockerfile) 
-- [`1.23.1-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/v1.23.1/Dockerfile)
+- [`1.25.4http3-alpine`, `1.25-alpine`, `latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
+- [`1.25.4-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
+- [`1.24.0-alpine`, `1.24-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.24.0/Dockerfile) 
+- [`1.23.3-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.23.3/Dockerfile) 
+- [`1.23.1-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.23.1/Dockerfile)
 
 # NGINX build with load balancer modules
 [![Docker Pulls](https://img.shields.io/docker/pulls/wsandwitch/nginx.svg)](https://hub.docker.com/r/wsandwitch/nginx/)
 
-**Fastest** and **smaller** Nginx built for many CPU architecture.
+Nginx built for many CPU architecture.
 
 The difference from the [official Nginx docker image](https://hub.docker.com/_/nginx):
 
@@ -35,7 +36,7 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 - with degradation module
 - using `/etc/nginx/sites-enabled/` for virtual host configuration (like Ubuntu)
 - without modules: http_xslt, http_image_filter, http_sub, http_dav, http_flv, http_mp4, http_random_index, http_slice, mail, mail_ssl, http_geoip, stream_geoip
-
+- with [http3](http://nginx.org/en/docs/http/ngx_http_v3_module.html) module
 ## How to use this image
 
 ### Hosting some simple static content
@@ -63,7 +64,7 @@ docker run --name some-nginx -d -p 80:80 -e 443 -p 443:443 \
     -v /etc/nginx/sites-available:/etc/nginx/sites-available \
     -v /etc/nginx/sites-enabled:/etc/nginx/sites-enabled \
     -v /var/log/nginx:/var/log/nginx \
-    wsandwitch/nginx-extra
+    wsandwitch/nginx
 ```
 
 ### Modules
