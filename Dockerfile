@@ -41,8 +41,6 @@ ENV OPENTRACING_MODULE_VERSION v0.27.0
 ENV MRUBY_MODULE_VERSION v2.5.0
 # https://github.com/tokers/zstd-nginx-module
 ENV ZSTD_MODULE_VERSION master
-# https://github.com/quictls/openssl
-ENV QUICTLS_VERSION openssl-3.1.5+quic
 # https://github.com/AlecJY/socks-nginx-module
 ENV SOCKS5HTTP_VERSION space-fix
 
@@ -112,15 +110,6 @@ RUN set -eux \
     && tar -zxC /usr/src -f nginx.tar.gz \
     && rm nginx.tar.gz 
 
-RUN set -eux && echo SSL \
-    && cd /usr/src/nginx-${NGINX_VERSION} \
-    && git clone --depth=1 --single-branch -b ${QUICTLS_VERSION} https://github.com/quictls/openssl \
-    && (cd openssl && git submodule update --init --recursive; \
-        ./Configure --prefix=/opt/openssl --libdir=lib --api=1.1.1; \
-	make -j3; \
-        make test TESTS="-test_afalg"; \
-        make install; \
-    ) 
 
     # Jaeger
 RUN set -eux && echo opentracing \
@@ -283,15 +272,14 @@ RUN set -eux && echo nginx \
             --with-http_ssl_module \
             --with-http_stub_status_module \
             --with-http_v2_module \
-            --with-http_v3_module \
             --with-pcre \
             --with-stream \
             --with-stream_realip_module \
             --with-stream_ssl_module \
             --with-stream_ssl_preread_module \
             --with-threads \
-            --with-cc-opt="-I${HUNTER_INSTALL_DIR}/include -I./openssl/include" \
-            --with-ld-opt="-L${HUNTER_INSTALL_DIR}/lib -lfts -L./openssl" \
+            --with-cc-opt="-I${HUNTER_INSTALL_DIR}/include" \
+            --with-ld-opt="-L${HUNTER_INSTALL_DIR}/lib -lfts" \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/echo-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/headers-more-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/memc-nginx-module \
@@ -341,7 +329,6 @@ COPY --from=build /usr/share/nginx /usr/share/nginx
 COPY --from=build /usr/local/lib/libopentracing.so* /usr/local/lib/
 COPY --from=build /usr/local/lib/libyaml-cpp.so* /usr/local/lib/
 COPY --from=build /usr/local/lib/libjaegertracing.so* /usr/local/lib/
-COPY --from=build /opt/openssl /opt/openssl
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY nginx.vh.default.conf /etc/nginx/conf.d/default.conf
@@ -350,6 +337,8 @@ RUN apk add --no-cache \
         libintl \
         libpq \
         libstdc++ \
+        libssl1.1 \
+        libcrypto1.1 \
         musl \
         pcre \
         readline \
