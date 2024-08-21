@@ -248,6 +248,7 @@ RUN set -eux && echo modules \
     ) \
     # ZStd compression
     && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION} https://github.com/tokers/zstd-nginx-module.git \
+    && (cd zstd-nginx-module && sed -i 's/if \[ "$HTTP_GZIP/if echo $HTTP_FILTER_MODULES | grep ngx_http_brotli_filter_module; then next=ngx_http_brotli_filter_module;echo "Brotli found"; elif \[ "$HTTP_GZIP/' filter/config ) \
     # http_socks5
     && git clone --depth=1 --single-branch -b ${SOCKS5HTTP_VERSION} https://github.com/AlecJY/socks-nginx-module.git
 
@@ -299,6 +300,7 @@ RUN set -eux && echo nginx \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-sticky-module-ng \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-stream-upsync-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-upsync-module \
+            --add-module=/usr/src/nginx-${NGINX_VERSION}/zstd-nginx-module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_brotli \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_devel_kit \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_redis \
@@ -311,7 +313,6 @@ RUN set -eux && echo nginx \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_mruby \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
-            --add-module=/usr/src/nginx-${NGINX_VERSION}/zstd-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/socks-nginx-module \
     && make -j$(getconf _NPROCESSORS_ONLN) \
     && make install \
