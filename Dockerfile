@@ -41,8 +41,12 @@ ENV OPENTRACING_MODULE_VERSION v0.27.0
 ENV MRUBY_MODULE_VERSION v2.5.0
 # https://github.com/tokers/zstd-nginx-module
 ENV ZSTD_MODULE_VERSION master
-# https://github.com/AlecJY/socks-nginx-module
-ENV SOCKS5HTTP_VERSION space-fix
+# https://github.com/WSandwitch/socks-nginx-module
+ENV SOCKS5HTTP_VERSION master
+# https://chobits/ngx_http_proxy_connect_module
+ENV CONNECT_MODULE_VERSION v0.0.7
+# https://github.com/oowl/ngx_stream_socks_module
+ENV STREAM_SOCKS_MODULE_VERSION 0.1.0
 
 COPY *.patch /tmp/
 
@@ -202,7 +206,7 @@ RUN set -eux && echo modules \
     && git clone --depth=1 --single-branch -b ${REDIS_MODULE_VERSION} https://github.com/centminmod/ngx_http_redis \
     \
     # A forward proxy module for CONNECT request handling
-    && git clone --depth=1 https://github.com/chobits/ngx_http_proxy_connect_module.git \
+    && git clone --depth=1 --single-branch -b ${CONNECT_MODULE_VERSION} https://github.com/chobits/ngx_http_proxy_connect_module.git \
     && patch -p1 < ngx_http_proxy_connect_module/patch/proxy_connect_rewrite_102101.patch \
     \
     # Sync upstreams from consul or others
@@ -239,7 +243,9 @@ RUN set -eux && echo modules \
     && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION} https://github.com/tokers/zstd-nginx-module.git \
     && (cd zstd-nginx-module && sed -i 's/if \[ "$HTTP_GZIP/if echo $HTTP_FILTER_MODULES | grep ngx_http_brotli_filter_module; then next=ngx_http_brotli_filter_module;echo "Brotli found"; elif \[ "$HTTP_GZIP/' filter/config ) \
     # http_socks5
-    && git clone --depth=1 --single-branch -b ${SOCKS5HTTP_VERSION} https://github.com/AlecJY/socks-nginx-module.git
+    && git clone --depth=1 --single-branch -b ${SOCKS5HTTP_VERSION} https://github.com/WSandwitch/socks-nginx-module.git \
+    # sock5 server
+    && git clone --depth=1 --single-branch -b ${STREAM_SOCKS_MODULE_VERSION}  https://github.com/oowl/ngx_stream_socks_module.git
 
 RUN set -eux && echo nginx \
     && cd /usr/src/nginx-${NGINX_VERSION} \
@@ -302,6 +308,7 @@ RUN set -eux && echo nginx \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/socks-nginx-module \
+            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_stream_socks_module \
     && make -j$(getconf _NPROCESSORS_ONLN) \
     && make install \
     && rm -rf /etc/nginx/html/ \

@@ -37,6 +37,8 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 - using `/etc/nginx/sites-enabled/` for virtual host configuration (like Ubuntu)
 - without modules: http_xslt, http_image_filter, http_sub, http_dav, http_flv, http_mp4, http_random_index, http_slice, mail, mail_ssl, http_geoip, stream_geoip
 - with [http3](http://nginx.org/en/docs/http/ngx_http_v3_module.html) module
+- with [socks server](https://github.com/oowl/ngx_stream_socks_module) module
+- with [sock5 rpoxy](https://github.com/dannote/socks-nginx-module) module
 ## How to use this image
 
 ### Hosting some simple static content
