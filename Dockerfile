@@ -1,4 +1,4 @@
-FROM alpine:3.17 AS build
+FROM alpine:3.20 AS build
 
 ENV NGINX_VERSION 1.24.0
 # https://github.com/nginx/njs
@@ -326,7 +326,7 @@ RUN set -eux && echo nginx \
         /usr/local/lib/libyaml-cpp.so* \
         /usr/local/lib/libjaegertracing.so*
 
-FROM alpine:3.17
+FROM alpine:3.20
 
 COPY --from=build /etc/nginx /etc/nginx
 COPY --from=build /usr/sbin/nginx /usr/sbin/nginx
@@ -345,8 +345,8 @@ RUN apk add --no-cache \
         libintl \
         libpq \
         libstdc++ \
-        libssl1.1 \
-        libcrypto1.1 \
+        libssl3 \
+        libcrypto3 \
         musl \
         pcre \
         readline \
