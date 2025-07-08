@@ -19,8 +19,8 @@ ENV POSTGRES_MODULE_VERSION 1.0
 ENV RDSJSON_MODULE_VERSION nginx-1.25.3
 # https://github.com/openresty/redis2-nginx-module
 ENV REDIS2_MODULE_VERSION v0.15
-# https://github.com/centminmod/ngx_http_redis
-ENV REDIS_MODULE_VERSION 0.4.1-cmm
+# https://github.com/WSandwitch/ngx_http_redis
+ENV REDIS_MODULE_VERSION master
 # https://github.com/openresty/set-misc-nginx-module
 ENV SETMISC_MODULE_VERSION v0.33
 # https://github.com/levonet/nginx-sticky-module-ng
@@ -39,7 +39,7 @@ ENV OPENTRACING_LIB_VERSION v1.6.0
 ENV OPENTRACING_MODULE_VERSION v0.27.0
 # https://github.com/matsumotory/ngx_mruby
 ENV MRUBY_MODULE_VERSION v2.5.0
-# https://github.com/tokers/zstd-nginx-module
+# https://github.com/L1H0n9Jun/ngx_http_zstd_module
 ENV ZSTD_MODULE_VERSION master
 # https://github.com/WSandwitch/socks-nginx-module
 ENV SOCKS5HTTP_VERSION master
@@ -203,7 +203,7 @@ RUN set -eux && echo modules \
     ) \
     \
     # Redis
-    && git clone --depth=1 --single-branch -b ${REDIS_MODULE_VERSION} https://github.com/centminmod/ngx_http_redis \
+    && git clone --depth=1 --single-branch -b ${REDIS_MODULE_VERSION} https://github.com/WSandwitch/ngx_http_redis \
     \
     # A forward proxy module for CONNECT request handling
     && git clone --depth=1 --single-branch -b ${CONNECT_MODULE_VERSION} https://github.com/chobits/ngx_http_proxy_connect_module.git \
@@ -240,8 +240,8 @@ RUN set -eux && echo modules \
         make generate_gems_config_dynamic \
     ) \
     # ZStd compression
-    && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION} https://github.com/tokers/zstd-nginx-module.git \
-    && (cd zstd-nginx-module && sed -i 's/if \[ "$HTTP_GZIP/if echo $HTTP_FILTER_MODULES | grep ngx_http_brotli_filter_module; then next=ngx_http_brotli_filter_module;echo "Brotli found"; elif \[ "$HTTP_GZIP/' filter/config ) \
+    && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION} https://github.com/L1H0n9Jun/ngx_http_zstd_module \
+    && (cd ngx_http_zstd_module && sed -i 's/if \[ "$HTTP_GZIP/if echo $HTTP_FILTER_MODULES | grep ngx_http_brotli_filter_module; then next=ngx_http_brotli_filter_module;echo "Brotli found"; elif \[ "$HTTP_GZIP/' filter/config ) \
     # http_socks5
     && git clone --depth=1 --single-branch -b ${SOCKS5HTTP_VERSION} https://github.com/WSandwitch/socks-nginx-module.git \
     # sock5 server
@@ -250,7 +250,7 @@ RUN set -eux && echo modules \
 RUN set -eux && echo nginx \
     && cd /usr/src/nginx-${NGINX_VERSION} \
     && export HUNTER_INSTALL_DIR=$(cat jaeger-client-cpp/.build/_3rdParty/Hunter/install-root-dir) \
-    && CFLAGS="-Ofast -pipe -fPIE -fPIC -flto -funroll-loops -fstack-protector-strong -ffast-math -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2" \
+    && CFLAGS="-Ofast -pipe -fPIE -fPIC -flto -funroll-loops -fstack-protector-strong -ffast-math -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2 -DZSTD_STATIC_LINKING_ONLY" \
         ./configure \
             --prefix=/etc/nginx \
             --sbin-path=/usr/sbin/nginx \
@@ -294,7 +294,7 @@ RUN set -eux && echo nginx \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-sticky-module-ng \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-stream-upsync-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-upsync-module \
-            --add-module=/usr/src/nginx-${NGINX_VERSION}/zstd-nginx-module \
+            --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_zstd_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_brotli \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_devel_kit \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_redis \

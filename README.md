@@ -20,13 +20,13 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 - with [Stream sync upstreams](https://github.com/xiaokai-wang/nginx-stream-upsync-module#readme) dynamic module
 - with [Upstream health check](https://github.com/2Fast2BCn/nginx_upstream_check_module#readme) module
 - with [Brotli](https://github.com/google/ngx_brotli#readme) module
-- with [ZStd](https://github.com/tokers/zstd-nginx-module) module
+- with [ZStd](https://github.com/L1H0n9Jun/ngx_http_zstd_module) module
 - with [Various set_xxx directives](https://github.com/openresty/set-misc-nginx-module#readme) dynamic module
 - with [Headers more](https://github.com/openresty/headers-more-nginx-module#readme) dynamic module
 - with [SRCache](https://github.com/openresty/srcache-nginx-module) dynamic module
 - with [Memc](https://github.com/openresty/memc-nginx-module) dynamic module
 - with [PostgreSQL](https://github.com/openresty/ngx_postgres) dynamic module
-- with [Redis](https://www.nginx.com/resources/wiki/modules/redis/) dynamic module
+- with [Redis](https://github.com/WSandwitch/ngx_http_redis) dynamic module
 - with [Redis2](https://github.com/openresty/redis2-nginx-module) dynamic module
 - with [Resty DBD Streams to JSON](https://github.com/openresty/rds-json-nginx-module) dynamic module
 - with [Echo](https://github.com/openresty/echo-nginx-module) dynamic module
