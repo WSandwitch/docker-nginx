@@ -1,6 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`1.25.4http3-alpine`, `1.25-alpine`, `latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
+- [`1.26.3http3-alpine`, `1.26-alpine`, `latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.26.3/Dockerfile) 
+- [`1.25.4http3-alpine`, `1.25-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
 - [`1.25.4-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
 - [`1.24.0-alpine`, `1.24-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.24.0/Dockerfile) 
 - [`1.23.3-alpine`, `1.23-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.23.3/Dockerfile) 
@@ -18,7 +19,7 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 - with [Sticky](https://github.com/levonet/nginx-sticky-module-ng) dynamic module
 - with [Sync upstreams](https://github.com/weibocom/nginx-upsync-module#readme) dynamic module
 - with [Stream sync upstreams](https://github.com/xiaokai-wang/nginx-stream-upsync-module#readme) dynamic module
-- with [Upstream health check](https://github.com/2Fast2BCn/nginx_upstream_check_module#readme) module
+- with [Upstream health check](https://github.com/yaoweibin/nginx_upstream_check_module#readme) module
 - with [Brotli](https://github.com/google/ngx_brotli#readme) module
 - with [ZStd](https://github.com/L1H0n9Jun/ngx_http_zstd_module) module
 - with [Various set_xxx directives](https://github.com/openresty/set-misc-nginx-module#readme) dynamic module
@@ -35,6 +36,7 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
   and [Jaeger](https://github.com/jaegertracing/jaeger-client-cpp) plugin
 - with degradation module
 - using `/etc/nginx/sites-enabled/` for virtual host configuration (like Ubuntu)
+- using `/etc/nginx/streams-enabled/` for port redirection configuration (like sites-enabled)
 - without modules: http_xslt, http_image_filter, http_sub, http_dav, http_flv, http_mp4, http_random_index, http_slice, mail, mail_ssl, http_geoip, stream_geoip
 - with [http3](http://nginx.org/en/docs/http/ngx_http_v3_module.html) module
 - with [socks server](https://github.com/oowl/ngx_stream_socks_module) module

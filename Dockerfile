@@ -1,14 +1,14 @@
 FROM alpine:3.20 AS build
 
-ENV NGINX_VERSION 1.25.4
+ENV NGINX_VERSION 1.26.3
 # https://github.com/nginx/njs
 ENV NJS_MODULE_VERSION 0.8.4
 # https://github.com/google/ngx_brotli
-ENV BROTLI_MODULE_VERSION 6e975bcb015f62e1f303054897783355e2a877dc
+ENV BROTLI_MODULE_VERSION a71f9312c2deb28875acc7bacfdd5695a111aa53
 # https://github.com/openresty/echo-nginx-module
 ENV ECHO_MODULE_VERSION v0.63
 # https://github.com/openresty/headers-more-nginx-module
-ENV HEADERS_MODULE_VERSION v0.37
+ENV HEADERS_MODULE_VERSION v0.39
 # https://github.com/openresty/memc-nginx-module
 ENV MEMC_MODULE_VERSION v0.20
 # https://github.com/vision5/ngx_devel_kit
@@ -38,11 +38,11 @@ ENV OPENTRACING_LIB_VERSION v1.6.0
 # https://github.com/opentracing-contrib/nginx-opentracing
 ENV OPENTRACING_MODULE_VERSION v0.27.0
 # https://github.com/matsumotory/ngx_mruby
-ENV MRUBY_MODULE_VERSION v2.5.0
+ENV MRUBY_MODULE_VERSION V2.7.0
 # https://github.com/L1H0n9Jun/ngx_http_zstd_module
 ENV ZSTD_MODULE_VERSION master 
 # https://github.com/quictls/openssl
-ENV QUICTLS_VERSION openssl-3.1.5+quic
+ENV QUICTLS_VERSION openssl-3.1.7+quic
 # https://github.com/WSandwitch/socks-nginx-module
 ENV SOCKS5HTTP_VERSION master
 # https://chobits/ngx_http_proxy_connect_module
