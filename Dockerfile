@@ -1,6 +1,6 @@
 FROM alpine:3.20 AS build
 
-ENV NGINX_VERSION 1.26.3
+ENV NGINX_VERSION 1.28.0
 # https://github.com/nginx/njs
 ENV NJS_MODULE_VERSION 0.8.4
 # https://github.com/google/ngx_brotli
@@ -43,12 +43,12 @@ ENV MRUBY_MODULE_VERSION V2.7.0
 ENV ZSTD_MODULE_VERSION master 
 # https://github.com/quictls/openssl
 ENV QUICTLS_VERSION openssl-3.1.7+quic
-# https://github.com/WSandwitch/socks-nginx-module
-ENV SOCKS5HTTP_VERSION master
 # https://chobits/ngx_http_proxy_connect_module
 ENV CONNECT_MODULE_VERSION v0.0.7
 # https://github.com/oowl/ngx_stream_socks_module
 ENV STREAM_SOCKS_MODULE_VERSION 0.1.0
+# https://github.com/WSandwitch/nginx_xproxy_module
+ENV XPROXY_MODULE_VERSION nginx-1.28
 
 COPY *.patch /tmp/
 
@@ -253,10 +253,11 @@ RUN set -eux && echo modules \
         NGX_MRUBY_CFLAGS=-O3 make build_mruby && \
         make generate_gems_config_dynamic \
     ) \
-    # http_socks5
-    && git clone --depth=1 --single-branch -b ${SOCKS5HTTP_VERSION} https://github.com/WSandwitch/socks-nginx-module.git \
     # sock5 server
-    && git clone --depth=1 --single-branch -b ${STREAM_SOCKS_MODULE_VERSION}  https://github.com/oowl/ngx_stream_socks_module.git
+    && git clone --depth=1 --single-branch -b ${STREAM_SOCKS_MODULE_VERSION}  https://github.com/oowl/ngx_stream_socks_module.git \
+    # http_xproxy
+    && git clone --depth=1 --single-branch -b ${XPROXY_MODULE_VERSION} https://github.com/WSandwitch/nginx_xproxy_module.git \
+    && patch -p1 < nginx_xproxy_module/http/patch_1.24.0.patch
 
 RUN set -eux && echo nginx \
     && cd /usr/src/nginx-${NGINX_VERSION} \
@@ -289,6 +290,7 @@ RUN set -eux && echo nginx \
             --with-http_secure_link_module \
             --with-http_ssl_module \
             --with-http_stub_status_module \
+            --with-http_sub_module \
             --with-http_v2_module \
             --with-http_v3_module \
             --with-pcre \
@@ -319,8 +321,8 @@ RUN set -eux && echo nginx \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_mruby \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
-            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/socks-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_stream_socks_module \
+            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx_xproxy_module/http \
     && make -j$(getconf _NPROCESSORS_ONLN) \
     && make install \
     && rm -rf /etc/nginx/html/ \

@@ -1,6 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`1.26.3http3-alpine`, `1.26-alpine`, `latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.26.3/Dockerfile) 
+- [`1.28.0-alpine`, `1.28-alpine`, `latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.28.0/Dockerfile) 
+- [`1.26.3-alpine`, `1.26-alpine`, (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.26.3/Dockerfile) 
 - [`1.25.4http3-alpine`, `1.25-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
 - [`1.25.4-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
 - [`1.24.0-alpine`, `1.24-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.24.0/Dockerfile) 
@@ -35,12 +36,13 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 - with [Opentracing](https://github.com/opentracing-contrib/nginx-opentracing) dynamic module
   and [Jaeger](https://github.com/jaegertracing/jaeger-client-cpp) plugin
 - with degradation module
+- with http_sub module
 - using `/etc/nginx/sites-enabled/` for virtual host configuration (like Ubuntu)
 - using `/etc/nginx/streams-enabled/` for port redirection configuration (like sites-enabled)
 - without modules: http_xslt, http_image_filter, http_sub, http_dav, http_flv, http_mp4, http_random_index, http_slice, mail, mail_ssl, http_geoip, stream_geoip
 - with [http3](http://nginx.org/en/docs/http/ngx_http_v3_module.html) module
-- with [socks server](https://github.com/oowl/ngx_stream_socks_module) module
-- with [sock5 rpoxy](https://github.com/dannote/socks-nginx-module) module
+- with [socks server](https://github.com/oowl/ngx_stream_socks_module) dynamic module
+- with [xproxy sock5 proxy](https://github.com/wsandwitch/nginx_xproxy_module) dynamic module
 ## How to use this image
 
 ### Hosting some simple static content
