@@ -33,6 +33,7 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 - with [Resty DBD Streams to JSON](https://github.com/openresty/rds-json-nginx-module) dynamic module
 - with [Echo](https://github.com/openresty/echo-nginx-module) dynamic module
 - with [A forward proxy](https://github.com/chobits/ngx_http_proxy_connect_module) module
+- with [Substitutions](https://github.com/yaoweibin/ngx_http_substitutions_filter_module) dynamic module
 - with [Opentracing](https://github.com/opentracing-contrib/nginx-opentracing) dynamic module
   and [Jaeger](https://github.com/jaegertracing/jaeger-client-cpp) plugin
 - with degradation module

@@ -38,7 +38,7 @@ ENV OPENTRACING_LIB_VERSION v1.6.0
 # https://github.com/opentracing-contrib/nginx-opentracing
 ENV OPENTRACING_MODULE_VERSION v0.27.0
 # https://github.com/matsumotory/ngx_mruby
-ENV MRUBY_MODULE_VERSION V2.7.0
+ENV MRUBY_MODULE_VERSION v2.7.0
 # https://github.com/L1H0n9Jun/ngx_http_zstd_module
 ENV ZSTD_MODULE_VERSION master 
 # https://github.com/quictls/openssl
@@ -49,6 +49,10 @@ ENV CONNECT_MODULE_VERSION v0.0.7
 ENV STREAM_SOCKS_MODULE_VERSION 0.1.0
 # https://github.com/WSandwitch/nginx_xproxy_module
 ENV XPROXY_MODULE_VERSION nginx-1.28
+# https://github.com/yaoweibin/ngx_http_substitutions_filter_module
+ENV SUBS_MODULE_VERSION master
+
+
 
 COPY *.patch /tmp/
 
@@ -250,14 +254,16 @@ RUN set -eux && echo modules \
         patch -p1 < /tmp/mruby_alpine.patch && \
         patch -p1 < /tmp/add_gems.patch && \
         ./configure --enable-dynamic-module --with-ngx-src-root=/usr/src/nginx-${NGINX_VERSION} --with-ngx-config-opt=--prefix=/etc/nginx --with-ndk-root=/usr/src/nginx-${NGINX_VERSION}/ngx_devel_kit && \
-        NGX_MRUBY_CFLAGS=-O3 make build_mruby && \
+        NGX_MRUBY_CFLAGS="-O3 -DFFC_DEBUG=0" make build_mruby && \
         make generate_gems_config_dynamic \
     ) \
     # sock5 server
     && git clone --depth=1 --single-branch -b ${STREAM_SOCKS_MODULE_VERSION}  https://github.com/oowl/ngx_stream_socks_module.git \
     # http_xproxy
     && git clone --depth=1 --single-branch -b ${XPROXY_MODULE_VERSION} https://github.com/WSandwitch/nginx_xproxy_module.git \
-    && patch -p1 < nginx_xproxy_module/http/patch_1.24.0.patch
+    && patch -p1 < nginx_xproxy_module/http/patch_1.24.0.patch \
+    # subs module
+    && git clone --depth=1 --single-branch -b ${SUBS_MODULE_VERSION}  https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git 
 
 RUN set -eux && echo nginx \
     && cd /usr/src/nginx-${NGINX_VERSION} \
@@ -323,6 +329,7 @@ RUN set -eux && echo nginx \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_stream_socks_module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx_xproxy_module/http \
+            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_substitutions_filter_module \
     && make -j$(getconf _NPROCESSORS_ONLN) \
     && make install \
     && rm -rf /etc/nginx/html/ \
