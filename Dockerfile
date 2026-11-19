@@ -51,6 +51,7 @@ ENV CONNECT_MODULE_VERSION v0.0.7
 ENV STREAM_SOCKS_MODULE_VERSION 0.1.0
 # https://github.com/WSandwitch/nginx_xproxy_module
 ENV XPROXY_MODULE_VERSION nginx-1.28
+ENV XPROXY_MODULE_COMMIT d25219e171da8fb99779905c339f5a1269d65a23
 # https://github.com/WSandwitch/njs_inline_patch
 ENV NJS_INLINE_PATCH_VERSION 354087e58bc272e008e28079538dd3b6352dbc62
 # https://github.com/yaoweibin/ngx_http_substitutions_filter_module
@@ -274,7 +275,8 @@ RUN set -eux && echo modules \
     # sock5 server
     && git clone --depth=1 --single-branch -b ${STREAM_SOCKS_MODULE_VERSION}  https://github.com/oowl/ngx_stream_socks_module.git \
     # http_xproxy
-    && git clone --depth=1 --single-branch -b ${XPROXY_MODULE_VERSION} https://github.com/WSandwitch/nginx_xproxy_module.git \
+    && git clone https://github.com/WSandwitch/nginx_xproxy_module.git \
+    && (cd nginx_xproxy_module && git checkout ${XPROXY_MODULE_COMMIT}) \
     && patch -p1 < nginx_xproxy_module/http/patch_1.24.0.patch \
     # subs module
     && git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git \
