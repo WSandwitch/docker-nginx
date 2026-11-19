@@ -20,7 +20,7 @@ ENV RDSJSON_MODULE_VERSION nginx-1.25.3
 # https://github.com/openresty/redis2-nginx-module
 ENV REDIS2_MODULE_VERSION v0.15
 # https://github.com/WSandwitch/ngx_http_redis
-ENV REDIS_MODULE_VERSION master
+ENV REDIS_MODULE_VERSION 7a842715e44ef9f305e72a2502c3b88f79c0353b
 # https://github.com/openresty/set-misc-nginx-module
 ENV SETMISC_MODULE_VERSION v0.33
 # https://github.com/levonet/nginx-sticky-module-ng
@@ -31,6 +31,8 @@ ENV SRCACHE_MODULE_VERSION v0.33
 ENV UPSYNC_MODULE_VERSION v2.1.3
 # https://github.com/xiaokai-wang/nginx-stream-upsync-module
 ENV UPSYNC_STREAM_MODULE_VERSION v1.2.2
+# https://github.com/yaoweibin/nginx_upstream_check_module
+ENV UPSTREAM_CHECK_MODULE_VERSION 87bfa66ddf16c17053ba7bbae72400c9939ecf6d
 # https://github.com/jaegertracing/jaeger-client-cpp
 ENV JAEGER_CLIENT_VERSION v0.9.0
 # https://github.com/opentracing/opentracing-cpp
@@ -40,7 +42,7 @@ ENV OPENTRACING_MODULE_VERSION v0.27.0
 # https://github.com/matsumotory/ngx_mruby
 ENV MRUBY_MODULE_VERSION v2.7.0
 # https://github.com/L1H0n9Jun/ngx_http_zstd_module
-ENV ZSTD_MODULE_VERSION master 
+ENV ZSTD_MODULE_VERSION 15c919093d7cf2dd747e1abe474fc47b49fcc0dd
 # https://github.com/quictls/openssl
 ENV QUICTLS_VERSION openssl-3.1.7+quic
 # https://chobits/ngx_http_proxy_connect_module
@@ -49,8 +51,10 @@ ENV CONNECT_MODULE_VERSION v0.0.7
 ENV STREAM_SOCKS_MODULE_VERSION 0.1.0
 # https://github.com/WSandwitch/nginx_xproxy_module
 ENV XPROXY_MODULE_VERSION nginx-1.28
+# https://github.com/WSandwitch/njs_inline_patch
+ENV NJS_INLINE_PATCH_VERSION 354087e58bc272e008e28079538dd3b6352dbc62
 # https://github.com/yaoweibin/ngx_http_substitutions_filter_module
-ENV SUBS_MODULE_VERSION master
+ENV SUBS_MODULE_VERSION e12e965ac1837ca709709f9a26f572a54d83430e
 
 
 
@@ -119,6 +123,13 @@ RUN set -eux \
     && mkdir -p /usr/src \
     && tar -zxC /usr/src -f nginx.tar.gz \
     && rm nginx.tar.gz 
+
+RUN set -eux \
+    && cd /usr/src/nginx-${NGINX_VERSION} \
+    && for p in /tmp/nginx_usn_9159_1_cve_*.patch; do \
+        echo "applying $p"; \
+        patch -p1 < "$p"; \
+    done
 
 RUN set -eux && echo SSL \
     && cd /usr/src/nginx-${NGINX_VERSION} \
@@ -202,7 +213,8 @@ RUN set -eux && echo modules \
     && git clone --depth=1 --single-branch -b ${STICKY_MODULE_VERSION} https://github.com/levonet/nginx-sticky-module-ng.git \
     \
     # Upstream health check
-    && git clone --depth=1 https://github.com/yaoweibin/nginx_upstream_check_module.git \
+    && git clone https://github.com/yaoweibin/nginx_upstream_check_module.git \
+    && (cd nginx_upstream_check_module && git checkout ${UPSTREAM_CHECK_MODULE_VERSION}) \
     && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.20.1+.patch \
     \
     # Brotli
@@ -218,10 +230,11 @@ RUN set -eux && echo modules \
     ) \
     \
     # ZStd compression
-    && git clone --depth=1 --single-branch -b ${ZSTD_MODULE_VERSION}  https://github.com/L1H0n9Jun/ngx_http_zstd_module.git \
-    && (cd ngx_http_zstd_module && sed -i 's/if \[ "$HTTP_GZIP/if echo $HTTP_FILTER_MODULES | grep ngx_http_brotli_filter_module; then next=ngx_http_brotli_filter_module;echo "Brotli found"; elif \[ "$HTTP_GZIP/' filter/config ) \
+    && git clone https://github.com/L1H0n9Jun/ngx_http_zstd_module.git \
+    && (cd ngx_http_zstd_module && git checkout ${ZSTD_MODULE_VERSION} && sed -i 's/if \[ "$HTTP_GZIP/if echo $HTTP_FILTER_MODULES | grep ngx_http_brotli_filter_module; then next=ngx_http_brotli_filter_module;echo "Brotli found"; elif \[ "$HTTP_GZIP/' filter/config ) \
     # Redis
-    && git clone --depth=1 --single-branch -b ${REDIS_MODULE_VERSION} https://github.com/WSandwitch/ngx_http_redis \
+    && git clone https://github.com/WSandwitch/ngx_http_redis \
+    && (cd ngx_http_redis && git checkout ${REDIS_MODULE_VERSION}) \
     \
     # A forward proxy module for CONNECT request handling
     && git clone --depth=1 --single-branch -b ${CONNECT_MODULE_VERSION} https://github.com/chobits/ngx_http_proxy_connect_module.git \
@@ -237,6 +250,7 @@ RUN set -eux && echo modules \
     && git clone --depth=1 --single-branch -b ${NJS_MODULE_VERSION} https://github.com/nginx/njs.git  \
     && git clone https://github.com/WSandwitch/njs_inline_patch \
     && (cd njs_inline_patch && \
+	git checkout ${NJS_INLINE_PATCH_VERSION} && \
 	sh apply.sh ../njs  \
     ) \
     && (cd njs && \
@@ -263,7 +277,8 @@ RUN set -eux && echo modules \
     && git clone --depth=1 --single-branch -b ${XPROXY_MODULE_VERSION} https://github.com/WSandwitch/nginx_xproxy_module.git \
     && patch -p1 < nginx_xproxy_module/http/patch_1.24.0.patch \
     # subs module
-    && git clone --depth=1 --single-branch -b ${SUBS_MODULE_VERSION}  https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git 
+    && git clone https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git \
+    && (cd ngx_http_substitutions_filter_module && git checkout ${SUBS_MODULE_VERSION})
 
 RUN set -eux && echo nginx \
     && cd /usr/src/nginx-${NGINX_VERSION} \

@@ -1,0 +1,13 @@
+diff --git a/src/stream/ngx_stream_ssl_module.c b/src/stream/ngx_stream_ssl_module.c
+index 2f1b996..a5cceb6 100644
+--- a/src/stream/ngx_stream_ssl_module.c
++++ b/src/stream/ngx_stream_ssl_module.c
+@@ -431,6 +431,8 @@ ngx_stream_ssl_handler(ngx_stream_session_t *s)
+         }
+     }
+ 
++    sscf = ngx_stream_get_module_srv_conf(s, ngx_stream_ssl_module);
++
+     if (sscf->verify) {
+         rc = SSL_get_verify_result(c->ssl->connection);
+ 

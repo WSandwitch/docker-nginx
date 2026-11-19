@@ -1,0 +1,13 @@
+diff --git a/src/http/v2/ngx_http_v2.c b/src/http/v2/ngx_http_v2.c
+index ed732f3..98b011d 100644
+--- a/src/http/v2/ngx_http_v2.c
++++ b/src/http/v2/ngx_http_v2.c
+@@ -3096,6 +3096,8 @@ ngx_http_v2_create_stream(ngx_http_v2_connection_t *h2c)
+ 
+     h2c->processing++;
+ 
++    ngx_reusable_connection(h2c->connection, 0);
++
+     h2c->priority_limit += h2scf->concurrent_streams;
+ 
+     if (h2c->connection->read->timer_set) {
