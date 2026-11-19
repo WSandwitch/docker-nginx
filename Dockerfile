@@ -51,7 +51,6 @@ ENV CONNECT_MODULE_VERSION v0.0.7
 ENV STREAM_SOCKS_MODULE_VERSION 0.1.0
 # https://github.com/WSandwitch/nginx_xproxy_module
 ENV XPROXY_MODULE_VERSION nginx-1.28
-ENV XPROXY_MODULE_COMMIT d25219e171da8fb99779905c339f5a1269d65a23
 # https://github.com/WSandwitch/njs_inline_patch
 ENV NJS_INLINE_PATCH_VERSION 354087e58bc272e008e28079538dd3b6352dbc62
 # https://github.com/yaoweibin/ngx_http_substitutions_filter_module
@@ -176,6 +175,8 @@ RUN set -eux && echo jaeger \
 #        make test; \
         make install \
     ) 
+
+ARG XPROXY_MODULE_COMMIT=d25219e171da8fb99779905c339f5a1269d65a23
 
 RUN set -eux && echo modules \
     && cd /usr/src/nginx-${NGINX_VERSION} \
