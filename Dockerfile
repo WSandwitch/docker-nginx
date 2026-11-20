@@ -1,48 +1,48 @@
 FROM alpine:3.20 AS build
 
-ENV NGINX_VERSION 1.28.0
+ENV NGINX_VERSION 1.30.7
 # https://github.com/nginx/njs
-ENV NJS_MODULE_VERSION 0.8.4
+ENV NJS_MODULE_VERSION 1.0.2
 # https://github.com/google/ngx_brotli
-ENV BROTLI_MODULE_VERSION a71f9312c2deb28875acc7bacfdd5695a111aa53
+ENV BROTLI_MODULE_VERSION 53e0fb55f250f48fe80c0ddbf6c0f7103cdbaae1
 # https://github.com/openresty/echo-nginx-module
-ENV ECHO_MODULE_VERSION v0.63
+ENV ECHO_MODULE_VERSION v0.66
 # https://github.com/openresty/headers-more-nginx-module
-ENV HEADERS_MODULE_VERSION v0.39
+ENV HEADERS_MODULE_VERSION v0.42
 # https://github.com/openresty/memc-nginx-module
-ENV MEMC_MODULE_VERSION v0.20
+ENV MEMC_MODULE_VERSION v0.21
 # https://github.com/vision5/ngx_devel_kit
 ENV NDK_MODULE_VERSION v0.3.3
 # https://github.com/openresty/ngx_postgres
-ENV POSTGRES_MODULE_VERSION 1.0
+ENV POSTGRES_MODULE_VERSION v1.2
 # https://github.com/openresty/rds-json-nginx-module
-ENV RDSJSON_MODULE_VERSION nginx-1.25.3
+ENV RDSJSON_MODULE_VERSION ngx-1.31.8
 # https://github.com/openresty/redis2-nginx-module
 ENV REDIS2_MODULE_VERSION v0.15
 # https://github.com/WSandwitch/ngx_http_redis
 ENV REDIS_MODULE_VERSION master
 # https://github.com/openresty/set-misc-nginx-module
-ENV SETMISC_MODULE_VERSION v0.33
+ENV SETMISC_MODULE_VERSION v0.34
 # https://github.com/levonet/nginx-sticky-module-ng
-ENV STICKY_MODULE_VERSION nginx-1.23.0
+ENV STICKY_MODULE_VERSION v1.2.3
 # https://github.com/openresty/srcache-nginx-module
-ENV SRCACHE_MODULE_VERSION v0.33
+ENV SRCACHE_MODULE_VERSION v0.34
 # https://github.com/weibocom/nginx-upsync-module
-ENV UPSYNC_MODULE_VERSION v2.1.3
+ENV UPSYNC_MODULE_VERSION v2.1.4
 # https://github.com/xiaokai-wang/nginx-stream-upsync-module
-ENV UPSYNC_STREAM_MODULE_VERSION v1.2.2
+ENV UPSYNC_STREAM_MODULE_VERSION v1.3.0
 # https://github.com/jaegertracing/jaeger-client-cpp
 ENV JAEGER_CLIENT_VERSION v0.9.0
 # https://github.com/opentracing/opentracing-cpp
 ENV OPENTRACING_LIB_VERSION v1.6.0
 # https://github.com/opentracing-contrib/nginx-opentracing
-ENV OPENTRACING_MODULE_VERSION v0.27.0
+ENV OPENTRACING_MODULE_VERSION v0.51.0
 # https://github.com/matsumotory/ngx_mruby
-ENV MRUBY_MODULE_VERSION v2.7.0
+ENV MRUBY_MODULE_VERSION v2.7.12
 # https://github.com/L1H0n9Jun/ngx_http_zstd_module
 ENV ZSTD_MODULE_VERSION master 
 # https://github.com/quictls/openssl
-ENV QUICTLS_VERSION openssl-3.1.7+quic
+ENV QUICTLS_VERSION openssl-3.3.0-quic1
 # https://chobits/ngx_http_proxy_connect_module
 ENV CONNECT_MODULE_VERSION v0.0.7
 # https://github.com/oowl/ngx_stream_socks_module
@@ -50,7 +50,7 @@ ENV STREAM_SOCKS_MODULE_VERSION 0.1.0
 # https://github.com/WSandwitch/nginx_xproxy_module
 ENV XPROXY_MODULE_VERSION nginx-1.28
 # https://github.com/yaoweibin/ngx_http_substitutions_filter_module
-ENV SUBS_MODULE_VERSION master
+ENV SUBS_MODULE_VERSION v0.6.4
 
 
 
@@ -203,7 +203,7 @@ RUN set -eux && echo modules \
     \
     # Upstream health check
     && git clone --depth=1 https://github.com/yaoweibin/nginx_upstream_check_module.git \
-    && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.20.1+.patch \
+    && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.30.4+.patch \
     \
     # Brotli
     && git clone https://github.com/google/ngx_brotli.git \
