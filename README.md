@@ -41,7 +41,7 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 - using `/etc/nginx/streams-enabled/` for port redirection configuration (like sites-enabled)
 - without modules: http_xslt, http_image_filter, http_sub, http_dav, http_flv, http_mp4, http_random_index, http_slice, mail, mail_ssl, http_geoip, stream_geoip
 - with [http3](http://nginx.org/en/docs/http/ngx_http_v3_module.html) module
-- with [xproxy sock5 proxy](https://github.com/wsandwitch/nginx_xproxy_module) dynamic module
+- with HTTP and stream SOCKS proxy ([xproxy](https://github.com/wsandwitch/nginx_xproxy_module)) dynamic modules
 ## How to use this image
 
 ### Hosting some simple static content

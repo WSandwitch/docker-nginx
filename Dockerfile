@@ -45,8 +45,7 @@ ENV QUICTLS_VERSION openssl-3.3.0-quic1
 # https://chobits/ngx_http_proxy_connect_module
 ENV CONNECT_MODULE_VERSION v0.0.7
 # https://github.com/WSandwitch/nginx_xproxy_module
-ENV XPROXY_MODULE_VERSION nginx-1.28
-ENV XPROXY_MODULE_COMMIT d25219e171da8fb99779905c339f5a1269d65a23
+ENV XPROXY_MODULE_VERSION v1.0
 # https://github.com/yaoweibin/ngx_http_substitutions_filter_module
 ENV SUBS_MODULE_VERSION v0.6.4
 # https://github.com/yaoweibin/nginx_upstream_check_module
@@ -127,7 +126,7 @@ RUN set -eux \
 RUN set -eux && echo SSL \
     && cd /usr/src/nginx-${NGINX_VERSION} \
     && git clone --depth=1 --single-branch -b ${QUICTLS_VERSION} https://github.com/quictls/openssl \
-    && (cd openssl && git submodule update --init --recursive; \
+    && (cd openssl; \
         ./Configure --prefix=/opt/openssl --libdir=lib --api=1.1.1; \
 	make -j3; \
         make test TESTS="-test_afalg"; \
@@ -263,7 +262,6 @@ RUN set -eux && echo modules \
     ) \
     # http_xproxy
     && git clone --depth=1 --single-branch -b ${XPROXY_MODULE_VERSION} https://github.com/WSandwitch/nginx_xproxy_module.git \
-    && (cd nginx_xproxy_module && git checkout ${XPROXY_MODULE_COMMIT}) \
     && patch -p1 < nginx_xproxy_module/http/patch_1.24.0.patch \
     # subs module
     && git clone --depth=1 --single-branch -b ${SUBS_MODULE_VERSION}  https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git 
@@ -329,6 +327,7 @@ RUN set -eux && echo nginx \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx_xproxy_module/http \
+            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx_xproxy_module/stream \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_substitutions_filter_module \
     && make -j$(getconf _NPROCESSORS_ONLN) \
     && make install \

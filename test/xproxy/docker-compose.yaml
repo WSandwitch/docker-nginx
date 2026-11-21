@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  test:
+    image: ${DOCKER_IMAGE:-wsandwitch/nginx:1.30.7-test}
+    network_mode: host
+    command:
+    - sh
+    - -c
+    - |
+      set -e
+      apk add --no-cache python3 git openssl >/dev/null
+      git clone --depth=1 --branch v1.0 https://github.com/WSandwitch/nginx_xproxy_module.git /tests >/dev/null 2>&1
+      cd /tests
+      python3 tests/socks/run.py \
+        --nginx /usr/sbin/nginx \
+        --http-module /usr/lib/nginx/modules/ngx_http_xproxy_module.so \
+        --stream-module /usr/lib/nginx/modules/ngx_stream_xproxy_module.so \
+        --label xproxy-v1.0 \
+        --mode functional
