@@ -266,10 +266,18 @@ RUN set -eux && echo modules \
     # subs module
     && git clone --depth=1 --single-branch -b ${SUBS_MODULE_VERSION}  https://github.com/yaoweibin/ngx_http_substitutions_filter_module.git 
 
+RUN set -eux \
+    && cd /usr/src/nginx-${NGINX_VERSION}/njs \
+    && make clean \
+    && ./configure \
+        --no-openssl --no-libxml2 --no-zlib \
+        --cc-opt="-O2 -pipe -fPIC -fomit-frame-pointer" \
+    && make
+
 RUN set -eux && echo nginx \
     && cd /usr/src/nginx-${NGINX_VERSION} \
     && export HUNTER_INSTALL_DIR=$(cat jaeger-client-cpp/.build/_3rdParty/Hunter/install-root-dir) \
-    && CFLAGS="-Ofast -pipe -fPIE -fPIC -flto -funroll-loops -fstack-protector-strong -ffast-math -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2  -DZSTD_STATIC_LINKING_ONLY" \
+    && CFLAGS="-O3 -pipe -fPIE -fPIC -funroll-loops -fstack-protector-strong -fomit-frame-pointer -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2  -DZSTD_STATIC_LINKING_ONLY" \
         ./configure \
             --prefix=/etc/nginx \
             --sbin-path=/usr/sbin/nginx \
@@ -307,7 +315,7 @@ RUN set -eux && echo nginx \
             --with-stream_ssl_preread_module \
             --with-threads \
             --with-cc-opt="-I${HUNTER_INSTALL_DIR}/include -I./openssl/include" \
-            --with-ld-opt="-L${HUNTER_INSTALL_DIR}/lib -lfts -L./openssl" \
+            --with-ld-opt="-L${HUNTER_INSTALL_DIR}/lib -Wl,--no-as-needed -lfts -L./openssl" \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/echo-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/headers-more-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/memc-nginx-module \

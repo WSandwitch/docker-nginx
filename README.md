@@ -1,6 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`1.28.0-alpine`, `1.28-alpine`, `latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.28.0/Dockerfile) 
+- [`1.30.7`, `1.30.7-alpine3.20`, `1.30-alpine3.20`, `latest` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.30.7/Dockerfile)
+- [`1.28.0-alpine3.20`, `1.28-alpine3.20` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.28.0/Dockerfile)
 - [`1.26.3-alpine`, `1.26-alpine`, (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.26.3/Dockerfile) 
 - [`1.25.4http3-alpine`, `1.25-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
 - [`1.25.4-alpine` (*Dockerfile*)](https://github.com/wsandwitch/docker-nginx/blob/1.25.4/Dockerfile) 
