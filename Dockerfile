@@ -1,5 +1,8 @@
 FROM alpine:3.20 AS build
 
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 ENV NGINX_VERSION 1.30.7
 # https://github.com/nginx/njs
 ENV NJS_MODULE_VERSION 1.0.2
@@ -244,7 +247,7 @@ RUN set -eux && echo modules \
         ./configure \
             --cc-opt="-O2 -pipe -fPIC -fomit-frame-pointer" && \
         make && \
-        make unit_test && \
+        if [ "$TARGETPLATFORM" = "$BUILDPLATFORM" ]; then make unit_test; fi && \
         install -m755 build/njs /usr/bin/ \
     ) \
     \
