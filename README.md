@@ -17,8 +17,7 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 
 - with [njs scripting language](http://nginx.org/en/docs/njs/) dynamic module (with [js_inline patch](https://github.com/WSandwitch/njs_inline_patch))
 - with [mruby scripting language](https://github.com/matsumotory/ngx_mruby) dynamic module
-- with [Sticky](https://github.com/levonet/nginx-sticky-module-ng) dynamic module
-- with [Sync upstreams](https://github.com/weibocom/nginx-upsync-module#readme) dynamic module
+- with [built-in upstream sticky sessions](https://nginx.org/en/docs/http/ngx_http_upstream_module.html#sticky) (nginx 1.30+)
 - with [Stream sync upstreams](https://github.com/xiaokai-wang/nginx-stream-upsync-module#readme) dynamic module
 - with [Upstream health check](https://github.com/yaoweibin/nginx_upstream_check_module#readme) module
 - with [Brotli](https://github.com/google/ngx_brotli#readme) module
@@ -42,7 +41,6 @@ The difference from the [official Nginx docker image](https://hub.docker.com/_/n
 - using `/etc/nginx/streams-enabled/` for port redirection configuration (like sites-enabled)
 - without modules: http_xslt, http_image_filter, http_sub, http_dav, http_flv, http_mp4, http_random_index, http_slice, mail, mail_ssl, http_geoip, stream_geoip
 - with [http3](http://nginx.org/en/docs/http/ngx_http_v3_module.html) module
-- with [socks server](https://github.com/oowl/ngx_stream_socks_module) dynamic module
 - with [xproxy sock5 proxy](https://github.com/wsandwitch/nginx_xproxy_module) dynamic module
 ## How to use this image
 

@@ -23,12 +23,8 @@ ENV REDIS2_MODULE_VERSION v0.15
 ENV REDIS_MODULE_VERSION master
 # https://github.com/openresty/set-misc-nginx-module
 ENV SETMISC_MODULE_VERSION v0.34
-# https://github.com/levonet/nginx-sticky-module-ng
-ENV STICKY_MODULE_VERSION v1.2.3
 # https://github.com/openresty/srcache-nginx-module
 ENV SRCACHE_MODULE_VERSION v0.34
-# https://github.com/weibocom/nginx-upsync-module
-ENV UPSYNC_MODULE_VERSION v2.1.4
 # https://github.com/xiaokai-wang/nginx-stream-upsync-module
 ENV UPSYNC_STREAM_MODULE_VERSION v1.3.0
 # https://github.com/jaegertracing/jaeger-client-cpp
@@ -45,8 +41,6 @@ ENV ZSTD_MODULE_VERSION master
 ENV QUICTLS_VERSION openssl-3.3.0-quic1
 # https://chobits/ngx_http_proxy_connect_module
 ENV CONNECT_MODULE_VERSION v0.0.7
-# https://github.com/oowl/ngx_stream_socks_module
-ENV STREAM_SOCKS_MODULE_VERSION 0.1.0
 # https://github.com/WSandwitch/nginx_xproxy_module
 ENV XPROXY_MODULE_VERSION nginx-1.28
 # https://github.com/yaoweibin/ngx_http_substitutions_filter_module
@@ -198,9 +192,6 @@ RUN set -eux && echo modules \
     # Various set_xxx directives added to nginx's rewrite module
     && git clone --depth=1 --single-branch -b ${SETMISC_MODULE_VERSION} https://github.com/openresty/set-misc-nginx-module.git \
     \
-    # Sticky
-    && git clone --depth=1 --single-branch -b ${STICKY_MODULE_VERSION} https://github.com/levonet/nginx-sticky-module-ng.git \
-    \
     # Upstream health check
     && git clone --depth=1 https://github.com/yaoweibin/nginx_upstream_check_module.git \
     && patch -p1 < /usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module/check_1.30.4+.patch \
@@ -224,11 +215,10 @@ RUN set -eux && echo modules \
     && git clone --depth=1 --single-branch -b ${REDIS_MODULE_VERSION} https://github.com/WSandwitch/ngx_http_redis \
     \
     # A forward proxy module for CONNECT request handling
+    # nginx 1.30 support: https://github.com/chobits/ngx_http_proxy_connect_module/pull/342
     && git clone --depth=1 --single-branch -b ${CONNECT_MODULE_VERSION} https://github.com/chobits/ngx_http_proxy_connect_module.git \
-    && patch -p1 < ngx_http_proxy_connect_module/patch/proxy_connect_rewrite_102101.patch \
-    \
-    # Sync upstreams from consul or others
-    && git clone --depth=1 --single-branch -b ${UPSYNC_MODULE_VERSION} https://github.com/weibocom/nginx-upsync-module.git \
+    && (cd ngx_http_proxy_connect_module && patch -p1 < /tmp/ngx_http_proxy_connect_module_allow_connect.patch) \
+    && patch -p1 < /tmp/proxy_connect_rewrite_103001.patch \
     \
     # Stream sync upstreams from consul or others
     && git clone --depth=1 --single-branch -b ${UPSYNC_STREAM_MODULE_VERSION} https://github.com/xiaokai-wang/nginx-stream-upsync-module.git \
@@ -257,8 +247,6 @@ RUN set -eux && echo modules \
         NGX_MRUBY_CFLAGS="-O3 -DFFC_DEBUG=0" make build_mruby && \
         make generate_gems_config_dynamic \
     ) \
-    # sock5 server
-    && git clone --depth=1 --single-branch -b ${STREAM_SOCKS_MODULE_VERSION}  https://github.com/oowl/ngx_stream_socks_module.git \
     # http_xproxy
     && git clone --depth=1 --single-branch -b ${XPROXY_MODULE_VERSION} https://github.com/WSandwitch/nginx_xproxy_module.git \
     && patch -p1 < nginx_xproxy_module/http/patch_1.24.0.patch \
@@ -311,9 +299,7 @@ RUN set -eux && echo nginx \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/headers-more-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/memc-nginx-module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-opentracing/opentracing \
-            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-sticky-module-ng \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-stream-upsync-module \
-            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-upsync-module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_zstd_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_brotli \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_devel_kit \
@@ -327,7 +313,6 @@ RUN set -eux && echo nginx \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_mruby \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
-            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_stream_socks_module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx_xproxy_module/http \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_substitutions_filter_module \
     && make -j$(getconf _NPROCESSORS_ONLN) \
