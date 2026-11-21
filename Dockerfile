@@ -107,8 +107,6 @@ RUN set -eux \
     test -z "$found" && echo >&2 "error: failed to fetch GPG key $GPG_KEYS" && exit 1; \
     curl -fSL https://nginx.org/keys/pluknet.key -o nginx_signing.key \
     && gpg --import nginx_signing.key \
-    && curl -fSL https://nginx.org/keys/maxim.key -o nginx_signing.key \
-    && gpg --import nginx_signing.key \
     && curl -fSL https://nginx.org/keys/arut.key -o nginx_signing.key \
     && gpg --import nginx_signing.key \
     && curl -fSL https://nginx.org/keys/sb.key -o nginx_signing.key \
