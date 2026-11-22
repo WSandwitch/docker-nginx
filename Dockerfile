@@ -1,8 +1,5 @@
 FROM alpine:3.20 AS build
 
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
-
 ENV NGINX_VERSION 1.30.7
 # https://github.com/nginx/njs
 ENV NJS_MODULE_VERSION 1.0.2
@@ -168,6 +165,9 @@ RUN set -eux && echo jaeger \
 #        make test; \
         make install \
     ) 
+
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 
 RUN set -eux && echo modules \
     && cd /usr/src/nginx-${NGINX_VERSION} \
