@@ -1,7 +1,7 @@
 PLATFORM_TAG ?= amd64
 DOCKER_TAG ?= latest_$(PLATFORM_TAG)
 DOCKER_IMAGE ?= wsandwitch/nginx-extra:$(DOCKER_TAG)
-TESTS = check jaeger njs proxy_connect redis sticky mruby
+TESTS = check jaeger njs proxy_connect redis sticky mruby modules stream-modules
 
 .PHONY: all build test clean $(TESTS)
 all: build test
@@ -12,7 +12,7 @@ build:
 
 $(TESTS):
 	cd $@; \
-	DOCKER_IMAGE=$(DOCKER_IMAGE) docker-compose up --build --abort-on-container-exit
+	DOCKER_IMAGE=$(DOCKER_IMAGE) docker compose up --build --abort-on-container-exit --exit-code-from test
 
 clean:
 	rm -rf */node_modules

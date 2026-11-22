@@ -1,0 +1,66 @@
+version: "3"
+
+services:
+  nginx:
+    image: ${DOCKER_IMAGE:-wsandwitch/nginx:1.30.7-test}
+    expose:
+    - "9003"
+    volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    - ./upstream.conf:/tmp/upsync/upstream.conf
+    depends_on:
+    - upsync1
+    - upsync2
+    - consul
+
+  upsync1:
+    image: node:20-alpine
+    command: node /app/backend.js
+    environment:
+      PREFIX: "one:"
+    volumes:
+    - ./backend.js:/app/backend.js:ro
+    expose:
+    - "9000"
+    networks:
+      default:
+        ipv4_address: 172.23.0.11
+
+  upsync2:
+    image: node:20-alpine
+    command: node /app/backend.js
+    environment:
+      PREFIX: "two:"
+    volumes:
+    - ./backend.js:/app/backend.js:ro
+    expose:
+    - "9000"
+    networks:
+      default:
+        ipv4_address: 172.23.0.12
+
+  consul:
+    image: node:20-alpine
+    command: node /app/consul.js
+    volumes:
+    - ./consul.js:/app/consul.js:ro
+    expose:
+    - "8500"
+
+  test:
+    build: .
+    command: node --test test/stream.test.js
+    environment:
+      NGINX_HOST: nginx
+      CONSUL_URL: http://consul:8500
+    depends_on:
+    - nginx
+    - upsync1
+    - upsync2
+    - consul
+
+networks:
+  default:
+    ipam:
+      config:
+      - subnet: "172.23.0.0/24"

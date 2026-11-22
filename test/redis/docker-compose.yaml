@@ -10,16 +10,24 @@ services:
     networks:
       nginx:
         ipv4_address: 172.16.253.10
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8000"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
   redis:
     image: redis:6
-    ports:
-    - "6379:6379"
     networks:
       nginx:
         ipv4_address: 172.16.253.20
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
   test:
     build: .
-    command: /usr/local/bin/dockerize -wait tcp://172.16.253.10:8000 -wait tcp://172.16.253.20:6379 -timeout 10s yarn test
+    command: npm test
     environment:
       NGINX_URL: http://172.16.253.10:8000
       REDIS_HOST: 172.16.253.20
@@ -30,8 +38,10 @@ services:
       nginx:
         ipv4_address: 172.16.253.99
     depends_on:
-    - nginx
-    - redis
+      nginx:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 networks:
   nginx:

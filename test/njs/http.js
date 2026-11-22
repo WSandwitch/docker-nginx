@@ -9,7 +9,7 @@ function test2(r) {
 
 function test3(r) {
     r.subrequest('/test3/subrequest', r.variables.args, (res) => {
-        r.return(res.status, res.responseBody);
+        r.return(res.status, res.responseText);
     });
 }
 

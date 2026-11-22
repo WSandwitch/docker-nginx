@@ -27,10 +27,8 @@ ENV SETMISC_MODULE_VERSION v0.33
 ENV STICKY_MODULE_VERSION nginx-1.23.0
 # https://github.com/openresty/srcache-nginx-module
 ENV SRCACHE_MODULE_VERSION v0.33
-# https://github.com/weibocom/nginx-upsync-module
-ENV UPSYNC_MODULE_VERSION v2.1.3
 # https://github.com/xiaokai-wang/nginx-stream-upsync-module
-ENV UPSYNC_STREAM_MODULE_VERSION v1.2.2
+ENV UPSYNC_STREAM_MODULE_VERSION v1.3.0
 # https://github.com/yaoweibin/nginx_upstream_check_module
 ENV UPSTREAM_CHECK_MODULE_VERSION 87bfa66ddf16c17053ba7bbae72400c9939ecf6d
 # https://github.com/jaegertracing/jaeger-client-cpp
@@ -47,8 +45,6 @@ ENV ZSTD_MODULE_VERSION 15c919093d7cf2dd747e1abe474fc47b49fcc0dd
 ENV QUICTLS_VERSION openssl-3.1.7+quic
 # https://chobits/ngx_http_proxy_connect_module
 ENV CONNECT_MODULE_VERSION v0.0.7
-# https://github.com/oowl/ngx_stream_socks_module
-ENV STREAM_SOCKS_MODULE_VERSION 0.1.0
 # https://github.com/WSandwitch/nginx_xproxy_module
 ENV XPROXY_MODULE_VERSION nginx-1.28
 # https://github.com/WSandwitch/njs_inline_patch
@@ -107,8 +103,6 @@ RUN set -eux \
     done; \
     test -z "$found" && echo >&2 "error: failed to fetch GPG key $GPG_KEYS" && exit 1; \
     curl -fSL https://nginx.org/keys/pluknet.key -o nginx_signing.key \
-    && gpg --import nginx_signing.key \
-    && curl -fSL https://nginx.org/keys/maxim.key -o nginx_signing.key \
     && gpg --import nginx_signing.key \
     && curl -fSL https://nginx.org/keys/arut.key -o nginx_signing.key \
     && gpg --import nginx_signing.key \
@@ -242,9 +236,6 @@ RUN set -eux && echo modules \
     && git clone --depth=1 --single-branch -b ${CONNECT_MODULE_VERSION} https://github.com/chobits/ngx_http_proxy_connect_module.git \
     && patch -p1 < ngx_http_proxy_connect_module/patch/proxy_connect_rewrite_102101.patch \
     \
-    # Sync upstreams from consul or others
-    && git clone --depth=1 --single-branch -b ${UPSYNC_MODULE_VERSION} https://github.com/weibocom/nginx-upsync-module.git \
-    \
     # Stream sync upstreams from consul or others
     && git clone --depth=1 --single-branch -b ${UPSYNC_STREAM_MODULE_VERSION} https://github.com/xiaokai-wang/nginx-stream-upsync-module.git \
     \
@@ -273,8 +264,6 @@ RUN set -eux && echo modules \
         NGX_MRUBY_CFLAGS="-O3 -DFFC_DEBUG=0" make build_mruby && \
         make generate_gems_config_dynamic \
     ) \
-    # sock5 server
-    && git clone --depth=1 --single-branch -b ${STREAM_SOCKS_MODULE_VERSION}  https://github.com/oowl/ngx_stream_socks_module.git \
     # http_xproxy
     && git clone https://github.com/WSandwitch/nginx_xproxy_module.git \
     && (cd nginx_xproxy_module && git checkout ${XPROXY_MODULE_COMMIT}) \
@@ -331,7 +320,6 @@ RUN set -eux && echo nginx \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-opentracing/opentracing \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-sticky-module-ng \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-stream-upsync-module \
-            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx-upsync-module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_zstd_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_brotli \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_devel_kit \
@@ -345,7 +333,6 @@ RUN set -eux && echo nginx \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_mruby \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/nginx_upstream_check_module \
             --add-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_proxy_connect_module \
-            --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_stream_socks_module \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/nginx_xproxy_module/http \
             --add-dynamic-module=/usr/src/nginx-${NGINX_VERSION}/ngx_http_substitutions_filter_module \
     && make -j$(getconf _NPROCESSORS_ONLN) \

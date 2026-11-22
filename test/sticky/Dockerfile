@@ -1,4 +1,4 @@
-FROM node:10-slim AS base
+FROM node:20-slim AS base
 
 ENV DOCKERIZE_VERSION v0.6.1
 RUN set -eux \
@@ -12,7 +12,7 @@ RUN mkdir -p /test
 WORKDIR /test
 
 COPY package.json yarn.lock /test/
-RUN yarn
+RUN npm install
 COPY test /test/test
 
 EXPOSE 8081

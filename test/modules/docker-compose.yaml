@@ -1,0 +1,58 @@
+version: "3"
+
+services:
+  nginx:
+    image: ${DOCKER_IMAGE:-wsandwitch/nginx:1.30.7-test}
+    expose:
+    - "8000"
+    volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+    - backend
+    - redis
+    - memcached
+    - postgres
+
+  backend:
+    image: node:20-alpine
+    command: node /app/backend.js
+    volumes:
+    - ./backend.js:/app/backend.js:ro
+    expose:
+    - "3000"
+
+  redis:
+    image: redis:6-alpine
+    expose:
+    - "6379"
+
+  memcached:
+    image: memcached:1.6-alpine
+    expose:
+    - "11211"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    expose:
+    - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d test"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  test:
+    build: .
+    command: node --test test/modules.test.js
+    environment:
+      NGINX_URL: http://nginx:8000
+    depends_on:
+    - nginx
+    - backend
+    - redis
+    - memcached
+    - postgres

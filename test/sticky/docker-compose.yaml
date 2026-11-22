@@ -12,7 +12,7 @@ services:
         ipv4_address: 172.16.254.10
   test:
     build: .
-    command: /usr/local/bin/dockerize -wait tcp://172.16.254.10:8000 -timeout 10s yarn test
+    command: /usr/local/bin/dockerize -wait tcp://172.16.254.10:8000 -timeout 10s npm test
     environment:
       NGINX_URL: http://172.16.254.10:8000
     ports:
