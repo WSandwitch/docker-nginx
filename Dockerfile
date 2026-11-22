@@ -170,6 +170,8 @@ RUN set -eux && echo jaeger \
         make install \
     ) 
 
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 ARG XPROXY_MODULE_COMMIT=d25219e171da8fb99779905c339f5a1269d65a23
 
 RUN set -eux && echo modules \
@@ -250,7 +252,7 @@ RUN set -eux && echo modules \
         ./configure \
             --cc-opt="-O2 -pipe -fPIC -fomit-frame-pointer" && \
         make && \
-        make unit_test && \
+        if [ "$TARGETPLATFORM" = "$BUILDPLATFORM" ]; then make unit_test; fi && \
         install -m755 build/njs /usr/bin/ \
     ) \
     \
